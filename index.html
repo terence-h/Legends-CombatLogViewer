@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>BANANA STRAWBERRY APPLE PEAR GRAPE MANGO PAPAYA</title>
+    <title>v1.0.1 Legends Combat Log Viewer</title>
+    <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
 
     <!-- CSS -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
@@ -94,7 +95,6 @@
 
                 <!-- COMBAT LOG FILTERING CONTROLS -->
                 <div class="mb-3">
-                    <!-- <label for="instance-id-filter" class="form-label" style="color: white;"></label> -->
                     <input type="text" class="form-control" id="instance-id-filter" placeholder="Instance ID filter | E.g. 6,4,23 or 6 4 23">
                 </div>
 
@@ -140,22 +140,16 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-json">
+                        <label class="form-check-label" for="flexCheckChecked" id="checkbox-filter-json">Show raw JSON</label>
+                    </div>
+                </div>
 
+                <!-- DEBUGGING BUTTON, DO NOT USE -->
                 <!-- <div class="row">
                     <button type="button" class="btn btn-dark" onclick="initialise()">Read Combat Log</button>
-                </div><br> -->
-
-                <!-- <div class="row">
-                    <div class="dropup-center dropup">
-                        <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Dropdown button
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                          <li><a class="dropdown-item active" href="#">Action</a></li>
-                          <li><a class="dropdown-item" href="#">Another action</a></li>
-                          <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </div>
                 </div><br> -->
             </div>
         </div>

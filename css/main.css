@@ -9,7 +9,8 @@ html, body {
 
 #jsonTextArea {
     min-width: 100%;
-    min-height: 50vh;
+    min-height: 25vh;
+    max-height: 50vh;
     background-color: darkgrey;
 }
 
@@ -55,6 +56,6 @@ html, body {
     padding: 0%;
 }
 
-#checkbox-filter-dmg, #checkbox-filter-heal, #checkbox-filter-buff, #checkbox-filter-energy, #checkbox-filter-anim, #checkbox-filter-tag {
+#checkbox-filter-dmg, #checkbox-filter-heal, #checkbox-filter-buff, #checkbox-filter-energy, #checkbox-filter-anim, #checkbox-filter-tag, #checkbox-filter-json {
     color: white;
 }

@@ -11,6 +11,7 @@ var showBuffFilter = document.getElementById("checkbox-checked-buff");
 var showEnergyFilter = document.getElementById("checkbox-checked-energy");
 var showAnimFilter = document.getElementById("checkbox-checked-anim");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
+var showJsonFilter = document.getElementById("checkbox-checked-json");
 
 // Combat log data
 var combatLog = null;
@@ -342,7 +343,6 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
 
             case "damage": {
                 if (_.startsWith(text, "-")) {
-                    // text = _.split(text, "-")[1];
                     text = _.replace(text, "-", "+");
                     colText.setAttribute("id", "log-heal-colour");
                 }
@@ -365,7 +365,14 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
             }
 
             case "matchend": {
-                text = "WINNA";
+                if (text == "2") {
+                    text = "FRIENDLY WIN";
+                    colText.setAttribute("id", "log-heal-colour");
+                }
+                else {
+                    text = "ENEMY WIN";
+                    colText.setAttribute("id", "log-damage-colour");
+                }
                 break;
             }
         }
@@ -492,8 +499,6 @@ inputInstanceID.addEventListener('input', function (evt) {
         selectedInstanceID[instanceID] = true;
     });
 
-    console.log(selectedInstanceID);
-
     resetCombatLog();
 });
 
@@ -528,4 +533,11 @@ showTagFilter.addEventListener('change', function (evt) {
     else {
         destroyCombatLogTagHeader();
     }
+});
+
+showJsonFilter.addEventListener('change', function (evt) {
+    if (jsonFile == null)
+        return;
+
+    window.jsonTextArea.value = evt.currentTarget.checked ? window.jsonString : "";
 });

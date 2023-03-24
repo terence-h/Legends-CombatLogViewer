@@ -1,5 +1,6 @@
 var jsonTextArea = document.getElementById('jsonTextArea');
 var jsonFile = null;
+var jsonString = null;
 
 jsonTextArea.ondragover = function () {
     this.className = 'hover';
@@ -20,15 +21,15 @@ jsonTextArea.ondrop = function (e) {
 
     reader.onload = function (event) {
         try {
-            jsonTextArea.value = event.target.result;
-            jsonFile = JSON.parse(jsonTextArea.value);
+            jsonString = event.target.result;
+            jsonTextArea.value = window.showJsonFilter.checked ? event.target.result : "";
+            jsonFile = JSON.parse(event.target.result);
             console.log(jsonFile);
             window.initialise();
-            // jsonTextArea.value = "";
         }
         catch (error) {
-            jsonTextArea.value = "DRAG AND DROP THE COMBAT LOG JSON FILE IN HERE. 💩💩💩💩💩💩💩💩💩"
-            console.error("Not a JSON file. 💩💩💩");
+            jsonTextArea.value = "Not a JSON file. 💩💩💩"
+            console.error(error);
         }
     };
 
