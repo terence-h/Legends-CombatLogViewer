@@ -1,0 +1,60 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin-top: 0.2%;
+    margin-bottom: 0.2%;
+    background-color: dimgray;
+    overflow: hidden;
+}
+
+#jsonTextArea {
+    min-width: 100%;
+    min-height: 50vh;
+    background-color: darkgrey;
+}
+
+#card-friendlies, #card-enemies {
+    background-color: darkgrey;
+    min-height: 8.5vh;
+    max-height: 8.5vh;
+}
+
+#card-combat-log {
+    min-height: 73vh;
+    max-height: 73vh;
+    background-color: darkgrey;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#combat-log-header {
+    background-color: darkgrey;
+    min-height: 7.9vh;
+    max-height: 7.9vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#header-text {
+    font-weight: bold;
+}
+
+#log-entry {
+    min-height: 30px;
+}
+
+#log-damage-colour, #log-enemy-colour {
+    color: darkred;
+}
+
+#log-heal-colour, #log-friendly-colour {
+    color: darkgreen;
+}
+
+#log-dropdown-button {
+    padding: 0%;
+}
+
+#checkbox-filter-dmg, #checkbox-filter-heal, #checkbox-filter-buff, #checkbox-filter-energy, #checkbox-filter-anim, #checkbox-filter-tag {
+    color: white;
+}
