@@ -3,7 +3,7 @@ html, body {
     width: 100%;
     margin-top: 0.2%;
     margin-bottom: 0.2%;
-    background-color: dimgray;
+    background-color: black;
     overflow: hidden;
 }
 
@@ -11,27 +11,26 @@ html, body {
     min-width: 100%;
     min-height: 25vh;
     max-height: 50vh;
-    background-color: darkgrey;
+    background-color: black;
+    color: dimgray;
 }
 
 #card-friendlies, #card-enemies {
-    background-color: darkgrey;
+    background-color: rgb(125, 125, 125);
     min-height: 8.5vh;
-    max-height: 8.5vh;
 }
 
 #card-combat-log {
     min-height: 73vh;
     max-height: 73vh;
-    background-color: darkgrey;
+    background-color: rgb(125, 125, 125);
     overflow-x: hidden;
     overflow-y: scroll;
 }
 
 #combat-log-header {
-    background-color: darkgrey;
-    min-height: 7.9vh;
-    max-height: 7.9vh;
+    background-color: rgb(125, 125, 125);
+    min-height: 8vh;
     overflow-x: hidden;
     overflow-y: scroll;
 }
@@ -54,6 +53,11 @@ html, body {
 
 #log-dropdown-button {
     padding: 0%;
+}
+
+#instance-id-filter {
+    background-color: black;
+    color: dimgray;
 }
 
 #checkbox-filter-dmg, #checkbox-filter-heal, #checkbox-filter-buff, #checkbox-filter-energy, #checkbox-filter-anim, #checkbox-filter-tag, #checkbox-filter-json {
