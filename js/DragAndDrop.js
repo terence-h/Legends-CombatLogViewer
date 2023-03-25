@@ -1,19 +1,20 @@
-var jsonTextArea = document.getElementById('jsonTextArea');
+var jsonTextArea = document.getElementById("jsonTextArea");
 var jsonFile = null;
 var jsonString = null;
 
 jsonTextArea.ondragover = function () {
-    this.className = 'hover';
+    this.classList.add("hover");
     return false;
 };
 
 jsonTextArea.ondragend = function () {
-    this.className = '';
+    this.classList.remove("hover");
     return false;
 };
 
 jsonTextArea.ondrop = function (e) {
-    this.className = '';
+    this.classList.remove("hover");
+    
     e.preventDefault();
 
     var file = e.dataTransfer.files[0],

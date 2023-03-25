@@ -3,7 +3,6 @@ html, body {
     width: 100%;
     margin-top: 0.2%;
     margin-bottom: 0.2%;
-    background-color: black;
     overflow: hidden;
 }
 
@@ -11,26 +10,22 @@ html, body {
     min-width: 100%;
     min-height: 25vh;
     max-height: 50vh;
-    background-color: black;
-    color: dimgray;
 }
 
 #card-friendlies, #card-enemies {
-    background-color: rgb(125, 125, 125);
     min-height: 8.5vh;
 }
 
-#card-combat-log {
-    min-height: 73vh;
-    max-height: 73vh;
-    background-color: rgb(125, 125, 125);
+#combat-log-header {
+    min-height: 8vh;
     overflow-x: hidden;
     overflow-y: scroll;
 }
 
-#combat-log-header {
-    background-color: rgb(125, 125, 125);
-    min-height: 8vh;
+#card-combat-log {
+    /* 75vh is the max but borders will be cut off on the bottom due to top margin */
+    /* Number is determined by the top values (100vh - card-friendlies - card-enemies - combat-log-header) */
+    max-height: 72.5vh; 
     overflow-x: hidden;
     overflow-y: scroll;
 }
@@ -44,22 +39,29 @@ html, body {
 }
 
 #log-damage-colour, #log-enemy-colour {
-    color: darkred;
+    color: rgb(187, 45, 59);
 }
 
 #log-heal-colour, #log-friendly-colour {
-    color: darkgreen;
+    color: rgb(21, 115, 71);
 }
 
 #log-dropdown-button {
-    padding: 0%;
+    padding: 2%;
 }
 
-#instance-id-filter {
+.lightmode-bg {
+    background-color: whitesmoke;
+}
+
+.lightmode-text {
+    color: black;
+}
+
+.darkmode-bg {
     background-color: black;
-    color: dimgray;
 }
 
-#checkbox-filter-dmg, #checkbox-filter-heal, #checkbox-filter-buff, #checkbox-filter-energy, #checkbox-filter-anim, #checkbox-filter-tag, #checkbox-filter-json {
-    color: white;
+.darkmode-text {
+    color: whitesmoke;
 }

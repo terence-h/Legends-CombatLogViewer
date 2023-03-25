@@ -13,6 +13,8 @@ var showAnimFilter = document.getElementById("checkbox-checked-anim");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
 var showJsonFilter = document.getElementById("checkbox-checked-json");
 
+var characterFilters = null;
+
 // Combat log data
 var combatLog = null;
 var friendlies = null;
@@ -84,6 +86,8 @@ function initialise() {
     addCharacters(friendlies);
     addCharacters(enemies, true);
     addCombatLog(combatLog);
+
+    characterFilters = document.getElementsByClassName("character-filter");
 }
 
 function addCharacters(characters, isEnemy = false) {
@@ -106,8 +110,7 @@ function addCharacters(characters, isEnemy = false) {
         var btn = document.createElement("button");
         // btn.innerHTML = `${dgpShortenNames[character.id]} - ${character.hp} HP`;
         btn.innerHTML = `${dgpShortenNames[character.id]} - ${character.id}`;
-        btn.classList.add("btn", "btn-xs");
-        isEnemy ? btn.classList.add("btn-danger") : btn.classList.add("btn-success");
+        btn.classList.add("btn", "btn-xs", isEnemy ? "btn-danger" : "btn-success", "character-filter");
         btn.type = "button";
         btn.index = character.id;
 
@@ -125,14 +128,14 @@ function addCharacters(characters, isEnemy = false) {
                 selectedDGPs = _.pull(selectedDGPs, characterID);
 
                 evt.target.classList.remove(isEnemy ? "btn-danger" : "btn-success");
-                evt.target.classList.add("btn-outline-dark");
+                evt.target.classList.add(window.useDarkMode.checked ? "btn-outline-light" : "btn-outline-dark");
             }
             // Does not exist, add and show character logs in viewer.
             else {
                 selectedDGPs.push(characterID);
 
                 evt.target.classList.add(isEnemy ? "btn-danger" : "btn-success");
-                evt.target.classList.remove("btn-outline-dark");
+                evt.target.classList.remove(window.useDarkMode.checked ? "btn-outline-light" : "btn-outline-dark");
             }
 
             resetContainers(false, false, true);
@@ -194,7 +197,7 @@ function addCombatLog(combatLog) {
 
         // Row
         var row = document.createElement("div");
-        row.classList.add("row", "border-dark", "border-bottom", "border-opacity-10");
+        row.classList.add("row", window.useDarkMode.checked ? "border-light" : "border-dark", "border-bottom", "border-opacity-10");
         row.setAttribute("id", "log-entry");
 
         // Logs
@@ -210,7 +213,9 @@ function addCombatLog(combatLog) {
             var colTags = createDropDownLog(tags, "col-1")
 
         divCombatLog.append(row);
-        row.append(colLog);
+
+        if (log.eventID != 10)
+            row.append(colLog);
 
         switch(log.eventID) {
             case 1: { // Movement
