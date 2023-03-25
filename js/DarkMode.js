@@ -27,7 +27,8 @@ function toggleDarkMode(enabled = false) {
 
     // Json text area and instance filter
     window.jsonTextArea.classList.add(bgColor, textColor);
-    window.inputInstanceID.classList.add(bgColor, textColor);
+    window.inputInstanceID.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;  
+    window.inputInstanceID.style.color = enabled ? whiteColorCode : blackColorCode;
 
     // Check box labels
     _.forEach(formCheckLabels, (label) => {
@@ -68,13 +69,15 @@ function toggleDarkMode(enabled = false) {
 function resetStyles() {
     // Clear the style of the json text area
     window.jsonTextArea.style = "";
+    window.inputInstanceID.style = "";
 
     // Only remove classes if this is not the first time toggling dark mode in this session.
     if (bgColor > 0 || textColor.length > 0) {
 
         // Json text area and instance filter
         window.jsonTextArea.classList.remove(bgColor, textColor);
-        window.inputInstanceID.classList.remove(bgColor, textColor);
+        window.inputInstanceID.style.backgroundColor = useDarkMode.checked ? blackColorCode : whiteColorCode;  
+        window.inputInstanceID.style.color = useDarkMode.checked ? whiteColorCode : blackColorCode;
 
         // Check box labels
         _.forEach(formCheckLabels, (label) => {
