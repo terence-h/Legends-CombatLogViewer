@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>v1.0.5 Legends Combat Log Viewer</title>
+    <title>v1.0.6 Legends Combat Log Viewer</title>
     <link rel="icon" type="image/x-icon" href="imgs/favicon.ico">
 
     <!-- CSS -->
@@ -17,13 +17,13 @@
     <script src="node_modules/lodash/lodash.min.js"></script>
 </head>
 
-<body>
-    
+<body style="display:none;">
+
     <div class="container-fluid">
         <div class="row">
 
             <!-- LEFT SIDE CONTENT -->
-            <div class="col-10">
+            <div class="col-10 order-first" id="col-combat-log">
 
                 <!-- FRIENDLIES FILTER BUTTONS -->
                 <div class="card">
@@ -49,7 +49,7 @@
 
                 <!-- COMBAT LOG VIEWER HEADERS -->
                 <div class="card">
-                    <div class="card-body" id="combat-log-header">
+                    <div class="card-body hidden-scroll lightmode-scroll" id="combat-log-header">
                         <div class="row" id="row-combat-log-header">
                             <div class="col-6 border-dark border-end"><p class="card-text text-center" id="header-text">Log</p></div>
                             <div class="col-1 border-dark border-end"><p class="card-text text-center" id="header-text">Damage/Heal/Duration</p></div>
@@ -57,7 +57,7 @@
                             <div class="col-1 border-dark border-end"><p class="card-text text-center" id="header-text">Attacker Energy</p></div>
                             <div class="col-1 border-dark border-end"><p class="card-text text-center" id="header-text">Target Energy</p></div>
                             <div class="col-1 border-dark border-end"><p class="card-text text-center" id="header-text">Instance ID</p></div>
-                            <div class="col-1 border-dark border-end"><p class="card-text text-center" id="header-text">Timestamp</p></div>
+                            <div class="col-1"><p class="card-text text-center" id="header-text">Timestamp</p></div>
                         </div>
                     </div>
                 </div>
@@ -69,79 +69,98 @@
             </div>
 
             <!-- RIGHT SIDE CONTENT -->
-            <div class="col-2">
+            <div class="col-2 order-last" id="col-panel">
 
-                <!-- JSON TEXT AREA -->
-                <div class="form-group">
-                    <textarea class="form-control" id="jsonTextArea" type="text" placeholder="Drag & Drop Combat Log JSON file here..." readonly></textarea>
-                </div>
-                <br>
+                <div class="container-fluid">
 
-                <!-- COMBAT LOG FILTERING CONTROLS -->
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="instance-id-filter" placeholder="Instance ID filter | E.g. 6,4,23 or 6 4 23">
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-dmg" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Show Damage Events</label>
+                    <!-- JSON TEXT AREA -->
+                    <div class="form-group">
+                        <textarea class="form-control" id="jsonTextArea" type="text" placeholder="Drag & Drop Combat Log JSON file here..." readonly></textarea>
                     </div>
-                </div>
+                    <br>
+    
+                    <!-- COMBAT LOG FILTERING CONTROLS -->
 
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-heal" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Show Heal Events</label>
+                    <!-- Instance ID filtering -->
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="instance-id-filter" placeholder="Instance ID filter | E.g. 6,4,23 or 6 4 23">
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-buff" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Show Buff Events</label>
+    
+                    <!-- Show damage events -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-dmg" checked>
+                            <label class="form-check-label" for="flexCheckChecked">Show Damage Events</label>
+                        </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-energy" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Show Energy Update Events</label>
+    
+                    <!-- Show heal events -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-heal" checked>
+                            <label class="form-check-label" for="flexCheckChecked">Show Heal Events</label>
+                        </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-anim" checked>
-                        <label class="form-check-label" for="flexCheckChecked">Show Animation Events</label>
+    
+                    <!-- Show buff events -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-buff" checked>
+                            <label class="form-check-label" for="flexCheckChecked">Show Buff Events</label>
+                        </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-tag">
-                        <label class="form-check-label" for="flexCheckChecked">Show Tags</label>
+    
+                    <!-- Show combat log energy update events. This only applies to positional buff bonus event -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-energy" checked>
+                            <label class="form-check-label" for="flexCheckChecked">Show Energy Update Events</label>
+                        </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-json">
-                        <label class="form-check-label" for="flexCheckChecked" id="checkbox-label">Show raw JSON</label>
+    
+                    <!-- Show combat log animation events -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-anim" checked>
+                            <label class="form-check-label" for="flexCheckChecked">Show Animation Events</label>
+                        </div>
                     </div>
-                </div>
-
-                <br><div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-darkmode">
-                        <label class="form-check-label" for="flexCheckChecked" id="checkbox-label">Use Dark Mode</label>
+    
+                    <!-- Show combat log tags -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-tag">
+                            <label class="form-check-label" for="flexCheckChecked">Show Tags</label>
+                        </div>
                     </div>
-                </div>
+    
+                    <!-- Show raw JSON file, useful to disable when trying to Ctrl + F -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-json">
+                            <label class="form-check-label" for="flexCheckChecked" id="checkbox-label">Show raw JSON</label>
+                        </div>
+                    </div>
+    
+                    <br>
 
-                <!-- DEBUGGING BUTTON, DO NOT USE -->
-                <!-- <div class="row">
-                    <button type="button" class="btn btn-dark" onclick="initialise()">Read Combat Log</button>
-                </div><br> -->
+                    <!-- Dark Mode -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-darkmode">
+                            <label class="form-check-label" for="flexCheckChecked" id="checkbox-label">Use Dark Mode</label>
+                        </div>
+                    </div>
+
+                    <!-- Change panel sides -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="checkbox-checked-move-panel">
+                            <label class="form-check-label" for="flexCheckChecked" id="checkbox-label">Move this panel to left</label>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -150,6 +169,7 @@
     <script src="js/DragAndDrop.js"></script>
     <script src="js/CombatLogReader.js"></script>
     <script src="js/DarkMode.js"></script>
+    <script src="js/LocalStorage.js"></script>
 </body>
 
 </html>

@@ -8,7 +8,8 @@ html, body {
 
 #jsonTextArea {
     min-width: 100%;
-    min-height: 25vh;
+    height: 50vh;
+    min-height: 20vh;
     max-height: 50vh;
 }
 
@@ -25,9 +26,9 @@ html, body {
 #card-combat-log {
     /* 75vh is the max but borders will be cut off on the bottom due to top margin */
     /* Number is determined by the top values (100vh - card-friendlies - card-enemies - combat-log-header) */
-    max-height: 72.5vh; 
+    max-height: 72.7vh; 
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 #header-text {
@@ -64,4 +65,46 @@ html, body {
 
 .darkmode-text {
     color: whitesmoke;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: dimgrey;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgb(180, 180, 180);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(150, 150, 150);
+}
+
+/* Little hack for "hidden" scrollbar while taking up space of the container */
+
+.lightmode-scroll::-webkit-scrollbar-track {
+    background-color: whitesmoke;
+}
+
+.lightmode-scroll::-webkit-scrollbar-thumb {
+    background-color: whitesmoke;
+}
+
+.lightmode-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: whitesmoke;
+}
+
+.darkmode-scroll::-webkit-scrollbar-track {
+    background-color: black;
+}
+
+.darkmode-scroll::-webkit-scrollbar-thumb {
+    background-color: black;
+}
+
+.darkmode-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: black;
 }

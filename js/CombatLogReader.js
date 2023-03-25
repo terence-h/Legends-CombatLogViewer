@@ -3,6 +3,8 @@ var divFriendlies = document.getElementById("row-friendlies");
 var divEnemies = document.getElementById("row-enemies");
 var divCombatLogHeaders = document.getElementById("row-combat-log-header");
 var divCombatLog = document.getElementById("card-combat-log");
+var divCombatLogCol = document.getElementById("col-combat-log");
+var divPanelCol = document.getElementById("col-panel");
 
 var inputInstanceID = document.getElementById("instance-id-filter");
 var showDmgFilter = document.getElementById("checkbox-checked-dmg");
@@ -12,6 +14,7 @@ var showEnergyFilter = document.getElementById("checkbox-checked-energy");
 var showAnimFilter = document.getElementById("checkbox-checked-anim");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
 var showJsonFilter = document.getElementById("checkbox-checked-json");
+var movePanelToLeft = document.getElementById("checkbox-checked-move-panel");
 
 var characterFilters = null;
 
@@ -32,7 +35,21 @@ var selectedDGPs = [];
 var selectedInstanceID = [];
 
 // Enums
-const EventIDs = {
+const EventID = Object.freeze({
+    Movement : 1,
+    Attacking : 2,
+    TakeDamage : 3,
+    Death : 4,
+    SpawnProjectile : 5,
+    UseSkill : 6,
+    UseUltimate : 7,
+    StatusEffect : 8,
+    EnergyUpdate : 9,
+    MatchEnd : 10,
+    StunEnd: 13
+});
+
+const EventName = Object.freeze({
     1 : "Movement",
     2 : "Attacking",
     3 : "Take Damage",
@@ -44,7 +61,7 @@ const EventIDs = {
     9 : "Energy Update",
     10 : "Game End",
     13 : "Stun End", // not supposed to be included. poop
-}
+});
 
 function initialise() {
 
@@ -94,7 +111,7 @@ function addCharacters(characters, isEnemy = false) {
     var container = document.createElement("div");
     container.classList.add("container");
 
-    characters.forEach((character, index) => {
+    characters.forEach((character) => {
         // By default, show all character logs
         selectedDGPs.push(character.id);
 
@@ -103,8 +120,8 @@ function addCharacters(characters, isEnemy = false) {
         dgpShortenNames[character.id] = isEnemy ? `${character.name.split("- enemy")[0]}` : `${character.name.split("- friendly")[0]}`
 
         // Columns
-        var col2 = document.createElement("div");
-        col2.classList.add("col-2");
+        var col = document.createElement("div");
+        col.classList.add("col-2");
 
         // Buttons for each character with it's max HP.
         var btn = document.createElement("button");
@@ -114,8 +131,8 @@ function addCharacters(characters, isEnemy = false) {
         btn.type = "button";
         btn.index = character.id;
 
-        isEnemy ? divEnemies.appendChild(col2) : divFriendlies.appendChild(col2);
-        col2.appendChild(btn);
+        isEnemy ? divEnemies.appendChild(col) : divFriendlies.appendChild(col);
+        col.appendChild(btn);
 
         btn.addEventListener("click", (evt) => {
             var characterID = evt.target.index;
@@ -147,7 +164,7 @@ function addCharacters(characters, isEnemy = false) {
 function addCombatLog(combatLog) {
     var dgpSlotId = -1;
     var dgpName = "";
-    var eventName = "";
+    var dgpNftID = "";
     var instanceID = "";
     var timestamp = "";
     var duration = undefined;
@@ -165,8 +182,7 @@ function addCombatLog(combatLog) {
     combatLog.forEach((log) => {
 
         dgpSlotId = log.characterID ? log.characterID : log.event.characterID;
-        dgpName = log.characterID ? dgpNames[log.characterID] : dgpNames[log.event.characterID];
-        eventName = EventIDs[log.eventID];
+        dgpName = dgpNames[dgpSlotId];
         instanceID = log.event ? log.event.instanceID : log.instanceID ? log.instanceID : undefined;
         timestamp = log.timestamp;
         tags = log.event ? log.event.tag : undefined;
@@ -176,15 +192,15 @@ function addCombatLog(combatLog) {
             return;
 
         // Show only selected DGPs
-        if (!filterByCharacterID(dgpSlotId) && log.eventID != 10)
+        if (!filterByCharacterID(dgpSlotId) && log.eventID != EventID.MatchEnd)
             return;
 
         // Show/Hide damage and/or heals
-        if (log.eventID == 3 && ((!showDamage && !_.startsWith(log.event.damageAmount, "-")) || (!showHeals && _.startsWith(log.event.damageAmount, "-"))))
+        if (log.eventID == EventID.TakeDamage && ((!showDamage && !_.startsWith(log.event.damageAmount, "-")) || (!showHeals && _.startsWith(log.event.damageAmount, "-"))))
             return;
 
         // Show/Hide energy update events (This is only used for position #4 buff)
-        if (log.eventID == 9 && !showEnergyUpdate)
+        if (log.eventID == EventID.EnergyUpdate && !showEnergyUpdate)
             return;
 
         // Show/Hide animation events
@@ -192,7 +208,7 @@ function addCombatLog(combatLog) {
             return;
 
         // Show/Hide buffs
-        if (log.eventID == 8 && !showBuffs)
+        if (log.eventID == EventID.StatusEffect && !showBuffs)
             return;
 
         // Row
@@ -207,59 +223,77 @@ function addCombatLog(combatLog) {
         var colAttackerEnergy = undefined;
         var colTargetEnergy = undefined;
         var colInstanceID = createTextLog(true, instanceID ? `_${instanceID.toString()}` : "", "instanceID", "col-1", "border-dark", "border-end");
-        var colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1", "border-dark", "border-end");
+        
+        var colTimestamp = undefined;
+
+        if (showTagFilter.checked)
+            colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1", "border-dark", "border-end");
+        else
+            colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1");
 
         if (tags != undefined && showTags)
             var colTags = createDropDownLog(tags, "col-1")
 
         divCombatLog.append(row);
 
-        if (log.eventID != 10)
+        // Do not append the col-6 log for match end event.
+        if (log.eventID != EventID.MatchEnd)
             row.append(colLog);
 
         switch(log.eventID) {
-            case 1: { // Movement
+            case EventID.Movement: { // Movement
                 break;
             }
-            case 2: { // Attacking
+            case EventID.Attacking: { // Attacking
+                // Animation event
+                if (!log.event)
+                    break;
+
+                colAttackerEnergy = createTextLog(true, `${log.event.energyAmount} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 3: { // Take Damage
+            case EventID.TakeDamage: { // Take Damage
                 colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
                 colTargetHP = createTextLog(true, log.event.hp.toString(), "targetHP", "col-1", "border-dark", "border-end");
-                colAttackerEnergy = createTextLog(true, log.event.attackerEnergy.toString(), "cenergy", "col-1", "border-dark", "border-end");
-                colTargetEnergy = createTextLog(true, log.event.targetEnergy.toString(), "tenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
+                colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tenergy", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 4: { // Death
-                colAttackerEnergy = createTextLog(true, log.event.attackerEnergy.toString(), "cenergy", "col-1", "border-dark", "border-end");
+            case EventID.Death: { // Death
+                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${log.event.attackerID})`, "cenergy", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 5: { // Spawn Projectile
+            case EventID.SpawnProjectile: { // Spawn Projectile
                 break;
             }
-            case 6: { // Use Skill
+            case EventID.UseSkill: { // Use Skill
+                // Animation event
+                if (!log.event)
+                    break;
+
+                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 7: { // Use Ultimate
+            case EventID.UseUltimate: { // Use Ultimate
+                // Not required to send character energy since it's guaranteed to be 0.
                 break;
             }
-            case 8: { // Status Effect
+            case EventID.StatusEffect: { // Status Effect
                 duration = log.event ? log.event.duration.toString() : "";
                 colDmgHealDur = createTextLog(true, duration, "status", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 9: { // Energy Update
-                colAttackerEnergy = createTextLog(true, log.event.characterEnergy.toString(), "cenergy", "col-1", "border-dark", "border-end");
+            case EventID.EnergyUpdate: { // Energy Update
+                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
                 break;
             }
-            case 10: { // Match End
+            case EventID.MatchEnd: { // Match End
                 var test = createTextLog(true, log.event.victorID.toString(), "matchend", "col-12");
                 isMatchEndLog = true;
                 row.append(test);
                 break;
             }
-            case 13: { // Stun End
+            case EventID.StunEnd: { // Stun End
                 break;
             }
         }
@@ -442,7 +476,11 @@ function createCombatLogTagHeader() {
     tagHeader.append(p);
     divCombatLogHeaders.append(tagHeader);
 
+    // Shorten log column to accomodate for tags
     divCombatLogHeaders.children[0].classList.replace("col-6", "col-5");
+
+    // Add borders to timestamp column
+    divCombatLogHeaders.children[6].classList.add("border-dark", "border-end");
 
     return tagHeader;
 }
@@ -452,8 +490,14 @@ function destroyCombatLogTagHeader() {
     if (divCombatLogHeaders.children.length < 8)
         return false;
 
+    // Delete tags column
     divCombatLogHeaders.removeChild(divCombatLogHeaders.children[7]);
+
+    // Enlarge log column
     divCombatLogHeaders.children[0].classList.replace("col-5", "col-6");
+
+    // Remove borders on timestamp column
+    divCombatLogHeaders.children[6].classList.remove("border-dark", "border-end");
 
     resetCombatLog();
 }
@@ -462,6 +506,7 @@ function resetCombatLog() {
     if (jsonFile == null)
         return;
 
+    // Do not have to reset friendly/enemy container as it's only refreshing the combat log.
     resetContainers(false, false, true);
     addCombatLog(combatLog);
 }
@@ -489,11 +534,30 @@ function resetContainers(friendlies = true, enemies = true, combatLog = true) {
     }
 }
 
+function movePanel() {
+    if (movePanelToLeft.checked) {
+        divCombatLogCol.classList.replace("order-first", "order-last");
+        divPanelCol.classList.replace("order-last", "order-first");
+    }
+    else {
+        divCombatLogCol.classList.replace("order-last", "order-first");
+        divPanelCol.classList.replace("order-first", "order-last");
+    }
+}
+
 // EVENT LISTENERS
 
 inputInstanceID.addEventListener('input', function (evt) {
+
+    // Commas, numbers and white space allowed only
+    const regex = /^[0-9, ]*$/g;
+
+    // Invalid input
+    if(!regex.test(this.value))
+        return;
+
     // Spacebar and commas
-    var instanceIDs = this.value.split(/[ ,]/g);
+    var instanceIDs = this.value.split(/[, ]/g);
 
     // Clear out array first
     while (selectedInstanceID.length > 0) {
@@ -529,6 +593,8 @@ showAnimFilter.addEventListener('change', function (evt) {
 
 showTagFilter.addEventListener('change', function (evt) {
 
+    localStorage.setItem(keyNames[1], evt.currentTarget.checked ? 1 : 0);
+
     if (evt.currentTarget.checked) {
         createCombatLogTagHeader();
 
@@ -541,8 +607,17 @@ showTagFilter.addEventListener('change', function (evt) {
 });
 
 showJsonFilter.addEventListener('change', function (evt) {
+
+    localStorage.setItem(keyNames[2], evt.currentTarget.checked ? 1 : 0);
+
     if (jsonFile == null)
         return;
 
     window.jsonTextArea.value = evt.currentTarget.checked ? window.jsonString : "";
+});
+
+movePanelToLeft.addEventListener('change', function (evt) {
+    localStorage.setItem(keyNames[3], evt.currentTarget.checked ? 1 : 0);
+
+    movePanel();
 });
