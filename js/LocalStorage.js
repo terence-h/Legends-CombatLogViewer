@@ -27,6 +27,12 @@ window.onload = function(evt) {
     // Show/hide json string in textarea
     window.showJsonFilter.checked = keyValues[2] == 0 ? false : true;
 
+    if (evt.currentTarget.checked)
+        window.jsonTextArea.placeholder = "Drag & Drop Combat Log JSON file here...";
+    else
+        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
+
+    // Move control panel to left or keep it at right
     window.movePanelToLeft.checked = keyValues[3] == 0 ? false : true;
 
     if (window.movePanelToLeft.checked)

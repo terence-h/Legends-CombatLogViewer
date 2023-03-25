@@ -1,4 +1,5 @@
 var useDarkMode = document.getElementById("checkbox-checked-darkmode");
+var formCheckInputs = document.getElementsByClassName("form-check-input");
 var formCheckLabels = document.getElementsByClassName("form-check-label");
 var cardBodies = document.getElementsByClassName("card-body");
 var hiddenScrolls = document.getElementsByClassName("hidden-scroll");
@@ -8,6 +9,7 @@ var textColor = "";
 
 var blackColorCode = "black"; // for setting through styles instead of class such as form focus
 var whiteColorCode = "whitesmoke"; // for setting through styles instead of class such as form focus
+var checkBoxDarkModeCode = "checkbox-darkmode";
 
 var darkModeBgString = "darkmode-bg";
 var darkModeTextString = "darkmode-text";
@@ -30,6 +32,13 @@ function toggleDarkMode(enabled = false) {
     window.inputInstanceID.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;  
     window.inputInstanceID.style.color = enabled ? whiteColorCode : blackColorCode;
 
+    // Check boxes. Uses different colour scheme for dark mode for visibility.
+    if (enabled) {
+        _.forEach(formCheckInputs, (checkBox) => {
+            checkBox.classList.add(checkBoxDarkModeCode);
+        });
+    }
+
     // Check box labels
     _.forEach(formCheckLabels, (label) => {
         label.classList.add(bgColor, textColor);
@@ -42,8 +51,8 @@ function toggleDarkMode(enabled = false) {
 
     // Combat log header "invisible" scroll
     _.forEach(hiddenScrolls, (hiddenScroll) => {
-        hiddenScroll.classList.add(enabled ? "darkmode-scroll" : "lightmode-scroll");
-        hiddenScroll.classList.remove(enabled ? "lightmode-scroll" : "darkmode-scroll");
+        hiddenScroll.classList.add(enabled ? "darkmode-hidden-scroll" : "lightmode-hidden-scroll");
+        hiddenScroll.classList.remove(enabled ? "lightmode-hidden-scroll" : "darkmode-hidden-scroll");
     });
 
     // Json file is loaded already
@@ -67,9 +76,9 @@ function toggleDarkMode(enabled = false) {
 }
 
 function resetStyles() {
-    // Clear the style of the json text area
-    window.jsonTextArea.style = "";
-    window.inputInstanceID.style = "";
+    // Clear the style of the json text area and instance ID filtering
+    // window.jsonTextArea.style = "";
+    // window.inputInstanceID.style = "";
 
     // Only remove classes if this is not the first time toggling dark mode in this session.
     if (bgColor > 0 || textColor.length > 0) {
@@ -78,6 +87,11 @@ function resetStyles() {
         window.jsonTextArea.classList.remove(bgColor, textColor);
         window.inputInstanceID.style.backgroundColor = useDarkMode.checked ? blackColorCode : whiteColorCode;  
         window.inputInstanceID.style.color = useDarkMode.checked ? whiteColorCode : blackColorCode;
+
+        // Check boxes. Uses different colour scheme for dark mode for visibility.
+        _.forEach(formCheckInputs, (checkBox) => {
+            checkBox.classList.remove(checkBoxDarkModeCode);
+        });
 
         // Check box labels
         _.forEach(formCheckLabels, (label) => {

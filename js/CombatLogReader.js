@@ -27,7 +27,7 @@ var enemyId = null;
 var combatId = null;
 
 // Display data
-var dgpNames = [];
+// var dgpNames = [];
 var dgpShortenNames = [];
 
 // Filter
@@ -74,9 +74,9 @@ function initialise() {
     }
 
     // Clear out array first
-    while (dgpNames.length > 0) {
-        dgpNames.pop();
-    }
+    // while (dgpNames.length > 0) {
+    //     dgpNames.pop();
+    // }
 
     while (dgpShortenNames.length > 0) {
         dgpShortenNames.pop();
@@ -116,7 +116,7 @@ function addCharacters(characters, isEnemy = false) {
         selectedDGPs.push(character.id);
 
         // DGP name
-        dgpNames[character.id] = character.name;
+        // dgpNames[character.id] = character.name;
         dgpShortenNames[character.id] = isEnemy ? `${character.name.split("- enemy")[0]}` : `${character.name.split("- friendly")[0]}`
 
         // Columns
@@ -163,14 +163,12 @@ function addCharacters(characters, isEnemy = false) {
 
 function addCombatLog(combatLog) {
     var dgpSlotId = -1;
-    var dgpName = "";
-    var dgpNftID = "";
+    // var dgpName = "";
+    // var dgpNftID = "";
     var instanceID = "";
     var timestamp = "";
     var duration = undefined;
     var tags = [];
-
-    var isMatchEndLog = false;
 
     var showDamage = showDmgFilter.checked;
     var showHeals = showHealFilter.checked;
@@ -179,10 +177,12 @@ function addCombatLog(combatLog) {
     var showAnims = showAnimFilter.checked;
     var showTags = showTagFilter.checked;
 
+    jsonTextArea.placeholder = showJsonFilter.checked ? combatLog : "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
+
     combatLog.forEach((log) => {
 
         dgpSlotId = log.characterID ? log.characterID : log.event.characterID;
-        dgpName = dgpNames[dgpSlotId];
+        // dgpName = dgpNames[dgpSlotId];
         instanceID = log.event ? log.event.instanceID : log.instanceID ? log.instanceID : undefined;
         timestamp = log.timestamp;
         tags = log.event ? log.event.tag : undefined;
@@ -213,8 +213,7 @@ function addCombatLog(combatLog) {
 
         // Row
         var row = document.createElement("div");
-        row.classList.add("row", window.useDarkMode.checked ? "border-light" : "border-dark", "border-bottom", "border-opacity-10");
-        row.setAttribute("id", "log-entry");
+        row.classList.add("row", "log-entry", window.useDarkMode.checked ? "border-light" : "border-dark", "border-bottom", "border-opacity-10");
 
         // Logs
         var colLog = createTextLog(false, log.log, "log", showTags ? "col-5" : "col-6", "border-dark", "border-end");
@@ -223,16 +222,18 @@ function addCombatLog(combatLog) {
         var colAttackerEnergy = undefined;
         var colTargetEnergy = undefined;
         var colInstanceID = createTextLog(true, instanceID ? `_${instanceID.toString()}` : "", "instanceID", "col-1", "border-dark", "border-end");
-        
         var colTimestamp = undefined;
+        var colTags = undefined;
 
+        // Timestamp right border
         if (showTagFilter.checked)
             colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1", "border-dark", "border-end");
         else
             colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1");
 
+        // Only create the drop down when the log entry has tags.
         if (tags != undefined && showTags)
-            var colTags = createDropDownLog(tags, "col-1")
+            colTags = createDropDownLog(tags, "col-1")
 
         divCombatLog.append(row);
 
@@ -288,19 +289,14 @@ function addCombatLog(combatLog) {
                 break;
             }
             case EventID.MatchEnd: { // Match End
-                var test = createTextLog(true, log.event.victorID.toString(), "matchend", "col-12");
-                isMatchEndLog = true;
-                row.append(test);
-                break;
+                var colMatchEnd = createTextLog(true, log.event.victorID.toString(), "matchend", "col-12");
+                row.append(colMatchEnd);
+                return;
             }
             case EventID.StunEnd: { // Stun End
                 break;
             }
         }
-
-        // End of match log
-        if (isMatchEndLog)
-            return;
 
         // Create empty logs to fill the empty columns
 
@@ -330,6 +326,7 @@ function addCombatLog(combatLog) {
 }
 
 function filterByInstanceID(instanceID) {
+    // Set to true by default as this will run even if there's nothing in the filter.
     var shouldAdd = true;
 
     if (selectedInstanceID.length > 0) {
@@ -337,7 +334,7 @@ function filterByInstanceID(instanceID) {
             for (const [key, value] of Object.entries(selectedInstanceID)) {
                 if (instanceID == key && value == true) {
                     shouldAdd = true;
-                    break;
+                    break; // Instance ID matched, can break the for-loop
                 }
                 else {
                     shouldAdd = false;
@@ -375,7 +372,8 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
             case "log": {
                 if (_.endsWith(text, "dead")) {
                     colText.setAttribute("style", "text-decoration:line-through");
-                    colText.setAttribute("id", _.includes(text , "- friendly") ? "log-friendly-colour" : "log-enemy-colour");
+                    // colText.setAttribute("id", _.includes(text , "- friendly") ? "log-friendly-colour" : "log-enemy-colour");
+                    colText.classList.add(colText.setAttribute("id", _.includes(text , "- friendly") ? "log-friendly-colour" : "log-enemy-colour"));
                 }
                 break;
             }
@@ -383,11 +381,13 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
             case "damage": {
                 if (_.startsWith(text, "-")) {
                     text = _.replace(text, "-", "+");
-                    colText.setAttribute("id", "log-heal-colour");
+                    // colText.setAttribute("id", "log-heal-colour");
+                    colText.classList.add("log-heal-colour");
                 }
                 else {
                     text = `-${text}`;
-                    colText.setAttribute("id", "log-damage-colour");
+                    // colText.setAttribute("id", "log-damage-colour");
+                    colText.classList.add("log-damage-colour");
                 }
                 break;
             }
@@ -406,11 +406,13 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
             case "matchend": {
                 if (text == "2") {
                     text = "FRIENDLY WIN";
-                    colText.setAttribute("id", "log-heal-colour");
+                    // colText.setAttribute("id", "log-heal-colour");
+                    colText.classList.add("log-heal-colour");
                 }
                 else {
                     text = "ENEMY WIN";
-                    colText.setAttribute("id", "log-damage-colour");
+                    // colText.setAttribute("id", "log-damage-colour");
+                    colText.classList.add("log-damage-colour");
                 }
                 break;
             }
@@ -436,7 +438,7 @@ function createDropDownLog(tags, ...colClasses) {
     button.type = "button";
     button.setAttribute("data-bs-toggle", "dropdown");
     button.setAttribute("aria-expanded", "false");
-    button.setAttribute("id", "log-dropdown-button");
+    button.classList.add("log-dropdown-button");
     button.innerHTML = "Tags";
 
     var menu = document.createElement("ul");
@@ -469,14 +471,13 @@ function createCombatLogTagHeader() {
     var tagHeader = document.createElement("div");
     tagHeader.classList.add("col-1");
     var p = document.createElement("p");
-    p.classList.add("card-text", "text-center");
-    p.setAttribute("id", "header-text");
+    p.classList.add("card-text", "text-center", "text-header");
     p.innerHTML = "Tags";
 
     tagHeader.append(p);
     divCombatLogHeaders.append(tagHeader);
 
-    // Shorten log column to accomodate for tags
+    // Shorten log column to accommodate for tags
     divCombatLogHeaders.children[0].classList.replace("col-6", "col-5");
 
     // Add borders to timestamp column
@@ -609,6 +610,11 @@ showTagFilter.addEventListener('change', function (evt) {
 showJsonFilter.addEventListener('change', function (evt) {
 
     localStorage.setItem(keyNames[2], evt.currentTarget.checked ? 1 : 0);
+
+    if (evt.currentTarget.checked)
+        window.jsonTextArea.placeholder = "Drag & Drop Combat Log JSON file here...";
+    else
+        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
 
     if (jsonFile == null)
         return;
