@@ -539,10 +539,12 @@ function movePanel() {
     if (movePanelToLeft.checked) {
         divCombatLogCol.classList.replace("order-first", "order-last");
         divPanelCol.classList.replace("order-last", "order-first");
+        window.versioning.classList.replace("text-end", "text-start");
     }
     else {
         divCombatLogCol.classList.replace("order-last", "order-first");
         divPanelCol.classList.replace("order-first", "order-last");
+        window.versioning.classList.replace("text-start", "text-end");
     }
 }
 

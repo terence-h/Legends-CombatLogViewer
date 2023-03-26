@@ -3,6 +3,7 @@ var formCheckInputs = document.getElementsByClassName("form-check-input");
 var formCheckLabels = document.getElementsByClassName("form-check-label");
 var cardBodies = document.getElementsByClassName("card-body");
 var hiddenScrolls = document.getElementsByClassName("hidden-scroll");
+var versioning = document.getElementById("versioning");
 
 var bgColor = "";
 var textColor = "";
@@ -31,6 +32,9 @@ function toggleDarkMode(enabled = false) {
     window.jsonTextArea.classList.add(bgColor, textColor);
     window.inputInstanceID.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;  
     window.inputInstanceID.style.color = enabled ? whiteColorCode : blackColorCode;
+
+    // Versioning
+    versioning.classList.add(textColor);
 
     // Check boxes. Uses different colour scheme for dark mode for visibility.
     if (enabled) {
@@ -87,6 +91,9 @@ function resetStyles() {
         window.jsonTextArea.classList.remove(bgColor, textColor);
         window.inputInstanceID.style.backgroundColor = useDarkMode.checked ? blackColorCode : whiteColorCode;  
         window.inputInstanceID.style.color = useDarkMode.checked ? whiteColorCode : blackColorCode;
+
+        // Versioning
+        versioning.classList.remove(textColor);
 
         // Check boxes. Uses different colour scheme for dark mode for visibility.
         _.forEach(formCheckInputs, (checkBox) => {
