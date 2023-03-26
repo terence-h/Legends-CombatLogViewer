@@ -20,6 +20,7 @@
 <body style="display:none;">
 
     <div class="container-fluid">
+
         <div class="row">
 
             <!-- LEFT SIDE CONTENT -->
@@ -66,6 +67,7 @@
                 <div class="card">
                     <div class="card-body" id="card-combat-log"></div>
                 </div>
+
             </div>
 
             <!-- RIGHT SIDE CONTENT -->
@@ -89,7 +91,15 @@
 
                     <!-- Instance ID filtering -->
                     <div class="pb-2">
-                        <input type="text" class="form-control" id="instance-id-filter" placeholder="Instance ID filter | E.g. 6,4,23 or 6 4 23">
+                        <input type="text" class="form-control" id="instance-id-filter" placeholder="Instance ID filter | Space/comma delimiter">
+                    </div>
+
+                    <!-- Timestamp filtering -->
+                    <div class="pb-2">
+                        <div class="row">
+                            <div class="col-6"><input type="number" class="form-control" id="start-time-filter" placeholder="Start Time" min="0" max="100" step="0.1"></div>
+                            <div class="col-6"><input type="number" class="form-control" id="end-time-filter" placeholder="End Time" min="0" max="100" step="0.1"></div>
+                        </div>
                     </div>
     
                     <!-- Show damage events -->
@@ -170,13 +180,15 @@
                     </div>
 
                     <!-- Versioning -->
-                    <div class="pt-5">
-                        <p class="text-end" id="versioning">Version 1.0.9</p>
+                    <div class="pt-3">
+                        <p class="text-end" id="versioning">Version 1.0.10</p>
                     </div>
-
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
     <!-- BODY SCRIPTS -->

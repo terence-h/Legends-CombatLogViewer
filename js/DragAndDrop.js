@@ -26,7 +26,7 @@ jsonTextArea.ondrop = function (e) {
             jsonTextArea.value = window.showJsonFilter.checked ? event.target.result : "";
             jsonFile = JSON.parse(event.target.result);
             console.log(jsonFile);
-            window.initialise();
+            window.initialiseCombatLog();
         }
         catch (error) {
             jsonTextArea.value = "Not a JSON file. 💩💩💩"

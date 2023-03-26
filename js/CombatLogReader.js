@@ -6,7 +6,9 @@ var divCombatLog = document.getElementById("card-combat-log");
 var divCombatLogCol = document.getElementById("col-combat-log");
 var divPanelCol = document.getElementById("col-panel");
 
-var inputInstanceID = document.getElementById("instance-id-filter");
+var instanceIDFilter = document.getElementById("instance-id-filter");
+var startTimeFilter = document.getElementById("start-time-filter");
+var endTimeFilter = document.getElementById("end-time-filter");
 var showDmgFilter = document.getElementById("checkbox-checked-dmg");
 var showHealFilter = document.getElementById("checkbox-checked-heal");
 var showBuffFilter = document.getElementById("checkbox-checked-buff");
@@ -15,7 +17,6 @@ var showAnimFilter = document.getElementById("checkbox-checked-anim");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
 var showJsonFilter = document.getElementById("checkbox-checked-json");
 var movePanelToLeft = document.getElementById("checkbox-checked-move-panel");
-
 var characterFilters = null;
 
 // Combat log data
@@ -33,6 +34,8 @@ var dgpShortenNames = [];
 // Filter
 var selectedDGPs = [];
 var selectedInstanceID = [];
+var startTime = 0;
+var endTime = 0;
 
 // Enums
 const EventID = Object.freeze({
@@ -63,7 +66,7 @@ const EventName = Object.freeze({
     13 : "Stun End", // not supposed to be included. poop
 });
 
-function initialise() {
+function initialiseCombatLog() {
 
     var jsonFile = window.jsonFile;
 
@@ -89,6 +92,13 @@ function initialise() {
     while (selectedInstanceID.length > 0) {
         selectedInstanceID.pop();
     }
+
+    // Clear out filter values
+    instanceIDFilter.value = "";
+    startTimeFilter.value = "";
+    endTimeFilter.value = "";
+    startTime = 0;
+    endTime = 0;
 
     combatLog = jsonFile.combatLog;
     friendlies = jsonFile.characters[0].id != 1 ? jsonFile.characters.reverse() : jsonFile.characters; 
@@ -191,6 +201,9 @@ function addCombatLog(combatLog) {
         if (!filterByInstanceID(instanceID))
             return;
 
+        if ((startTime != "" || endTime != "") && !filterByTimestamp(timestamp))
+            return;
+
         // Show only selected DGPs
         if (!filterByCharacterID(dgpSlotId) && log.eventID != EventID.MatchEnd)
             return;
@@ -204,6 +217,7 @@ function addCombatLog(combatLog) {
             return;
 
         // Show/Hide animation events
+        // Still check via strings in case a sim bug where another event does not have instance ID and causes it to be accidentally removed
         if (!instanceID && _.endsWith(log.log, "animation.") && !showAnims)
             return;
 
@@ -250,18 +264,18 @@ function addCombatLog(combatLog) {
                 if (!log.event)
                     break;
 
-                colAttackerEnergy = createTextLog(true, `${log.event.energyAmount} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.energyAmount} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 break;
             }
             case EventID.TakeDamage: { // Take Damage
                 colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
                 colTargetHP = createTextLog(true, log.event.hp.toString(), "targetHP", "col-1", "border-dark", "border-end");
-                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
-                colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
+                colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tEnergy", "col-1", "border-dark", "border-end");
                 break;
             }
             case EventID.Death: { // Death
-                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${log.event.attackerID})`, "cenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${log.event.attackerID})`, "cEnergy", "col-1", "border-dark", "border-end");
                 break;
             }
             case EventID.SpawnProjectile: { // Spawn Projectile
@@ -272,7 +286,7 @@ function addCombatLog(combatLog) {
                 if (!log.event)
                     break;
 
-                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 break;
             }
             case EventID.UseUltimate: { // Use Ultimate
@@ -285,12 +299,15 @@ function addCombatLog(combatLog) {
                 break;
             }
             case EventID.EnergyUpdate: { // Energy Update
-                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cenergy", "col-1", "border-dark", "border-end");
+                colAttackerEnergy = createTextLog(true, `${log.event.characterEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 break;
             }
             case EventID.MatchEnd: { // Match End
-                var colMatchEnd = createTextLog(true, log.event.victorID.toString(), "matchend", "col-12");
+                var colMatchEnd = createTextLog(true, log.event.victorID.toString(), "matchEnd", "col-12");
                 row.append(colMatchEnd);
+
+                // Update end time filter max value
+                endTimeFilter.max = timestamp + 1;
                 return;
             }
             case EventID.StunEnd: { // Stun End
@@ -299,7 +316,6 @@ function addCombatLog(combatLog) {
         }
 
         // Create empty logs to fill the empty columns
-
         if (colDmgHealDur == undefined)
             colDmgHealDur = createTextLog(true, "", "damage", "col-1", "border-dark", "border-end");
 
@@ -307,10 +323,10 @@ function addCombatLog(combatLog) {
             colTargetHP = createTextLog(true, "", "targetHP", "col-1", "border-dark", "border-end");
 
         if (colAttackerEnergy == undefined)
-            colAttackerEnergy = createTextLog(true, "", "cenergy", "col-1", "border-dark", "border-end");
+            colAttackerEnergy = createTextLog(true, "", "cEnergy", "col-1", "border-dark", "border-end");
 
         if (colTargetEnergy == undefined)
-            colTargetEnergy = createTextLog(true, "", "tenergy", "col-1", "border-dark", "border-end");
+            colTargetEnergy = createTextLog(true, "", "tEnergy", "col-1", "border-dark", "border-end");
             
         row.append(colDmgHealDur);
         row.append(colTargetHP);
@@ -358,6 +374,25 @@ function filterByCharacterID(characterID) {
     });
 }
 
+function filterByTimestamp(timestamp) {
+    var hasStartTime = startTime != "";
+    var hasEndTime = endTime != "";
+
+    // Both start and end time
+    if ((hasStartTime && timestamp >= startTime) && (hasEndTime && timestamp <= endTime))
+        return true;
+
+    // Only start time
+    if ((!endTime && hasStartTime && timestamp >= startTime))
+        return true;
+
+    // Only end time
+    if ((!hasStartTime && hasEndTime && timestamp <= endTime))
+        return true;
+
+    return false;
+}
+
 function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses) {
 
     var col = document.createElement("div");
@@ -403,7 +438,7 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
                 break;
             }
 
-            case "matchend": {
+            case "matchEnd": {
                 if (text == "2") {
                     text = "FRIENDLY WIN";
                     // colText.setAttribute("id", "log-heal-colour");
@@ -550,7 +585,7 @@ function movePanel() {
 
 // EVENT LISTENERS
 
-inputInstanceID.addEventListener('input', function (evt) {
+instanceIDFilter.addEventListener("input", function (evt) {
 
     // Commas, numbers and white space allowed only
     const regex = /^[0-9, ]*$/g;
@@ -574,27 +609,47 @@ inputInstanceID.addEventListener('input', function (evt) {
     resetCombatLog();
 });
 
-showDmgFilter.addEventListener('change', function (evt) {
+startTimeFilter.addEventListener("input", function (evt) {
+    startTime = _.clamp(this.value, 0, endTimeFilter.max - 1);
+
+    // Only floor value if it's above the end time filter, this will make entering decimals easier
+    if (this.value >= endTimeFilter.max - 1)
+        this.value = _.floor(startTime);
+
     resetCombatLog();
 });
 
-showHealFilter.addEventListener('change', function (evt) {
+endTimeFilter.addEventListener("input", function (evt) {
+    endTime = _.clamp(this.value, 0, endTimeFilter.max - 1);
+
+    // Only ceil value if it's above the end time filter, this will make entering decimals easier
+    if (this.value >= endTimeFilter.max)
+        this.value = _.ceil(endTime);
+
     resetCombatLog();
 });
 
-showBuffFilter.addEventListener('change', function (evt) {
+showDmgFilter.addEventListener("change", function (evt) {
     resetCombatLog();
 });
 
-showEnergyFilter.addEventListener('change', function (evt) {
+showHealFilter.addEventListener("change", function (evt) {
     resetCombatLog();
 });
 
-showAnimFilter.addEventListener('change', function (evt) {
+showBuffFilter.addEventListener("change", function (evt) {
     resetCombatLog();
 });
 
-showTagFilter.addEventListener('change', function (evt) {
+showEnergyFilter.addEventListener("change", function (evt) {
+    resetCombatLog();
+});
+
+showAnimFilter.addEventListener("change", function (evt) {
+    resetCombatLog();
+});
+
+showTagFilter.addEventListener("change", function (evt) {
 
     localStorage.setItem(keyNames[1], evt.currentTarget.checked ? 1 : 0);
 
@@ -609,7 +664,7 @@ showTagFilter.addEventListener('change', function (evt) {
     }
 });
 
-showJsonFilter.addEventListener('change', function (evt) {
+showJsonFilter.addEventListener("change", function (evt) {
 
     localStorage.setItem(keyNames[2], evt.currentTarget.checked ? 1 : 0);
 
@@ -624,7 +679,7 @@ showJsonFilter.addEventListener('change', function (evt) {
     window.jsonTextArea.value = evt.currentTarget.checked ? window.jsonString : "";
 });
 
-movePanelToLeft.addEventListener('change', function (evt) {
+movePanelToLeft.addEventListener("change", function (evt) {
     localStorage.setItem(keyNames[3], evt.currentTarget.checked ? 1 : 0);
 
     movePanel();

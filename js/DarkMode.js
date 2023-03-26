@@ -1,4 +1,5 @@
 var useDarkMode = document.getElementById("checkbox-checked-darkmode");
+var formControls = document.getElementsByClassName("form-control");
 var formCheckInputs = document.getElementsByClassName("form-check-input");
 var formCheckLabels = document.getElementsByClassName("form-check-label");
 var cardBodies = document.getElementsByClassName("card-body");
@@ -28,15 +29,24 @@ function toggleDarkMode(enabled = false) {
     // Body bg
     document.body.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;
 
-    // Json text area and instance filter
-    window.jsonTextArea.classList.add(bgColor, textColor);
-    window.inputInstanceID.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;  
-    window.inputInstanceID.style.color = enabled ? whiteColorCode : blackColorCode;
+    // Boxes on left container
+    _.forEach(cardBodies, (cardBody) => {
+        cardBody.classList.add(bgColor, textColor);
+    });
 
-    // Versioning
-    versioning.classList.add(textColor);
+    // Combat log header "invisible" scroll
+    _.forEach(hiddenScrolls, (hiddenScroll) => {
+        hiddenScroll.classList.add(enabled ? "darkmode-hidden-scroll" : "lightmode-hidden-scroll");
+        // hiddenScroll.classList.remove(enabled ? "lightmode-hidden-scroll" : "darkmode-hidden-scroll");
+    });
 
-    // Check boxes. Uses different colour scheme for dark mode for visibility.
+    // Form controls (Textarea, input, etc.)
+    _.forEach(formControls, (formControl) => {
+        formControl.style.backgroundColor = enabled ? blackColorCode : whiteColorCode;
+        formControl.style.color = enabled ? whiteColorCode : blackColorCode;
+    });
+
+    // Check boxes. Uses different colour scheme in dark mode for visibility.
     if (enabled) {
         _.forEach(formCheckInputs, (checkBox) => {
             checkBox.classList.add(checkBoxDarkModeCode);
@@ -48,52 +58,33 @@ function toggleDarkMode(enabled = false) {
         label.classList.add(bgColor, textColor);
     });
 
-    // Boxes on left container
-    _.forEach(cardBodies, (cardBody) => {
-        cardBody.classList.add(bgColor, textColor);
-    });
+    // Versioning
+    versioning.classList.add(textColor);
 
-    // Combat log header "invisible" scroll
-    _.forEach(hiddenScrolls, (hiddenScroll) => {
-        hiddenScroll.classList.add(enabled ? "darkmode-hidden-scroll" : "lightmode-hidden-scroll");
-        hiddenScroll.classList.remove(enabled ? "lightmode-hidden-scroll" : "darkmode-hidden-scroll");
-    });
-
-    // Json file is loaded already
-    if (window.jsonFile) {
-        var rowEntries = document.getElementsByClassName("border-opacity-10");
-
-        // Update every single row entry class
-        _.forEach(rowEntries, (entry) => {
-            entry.classList.add(enabled ? "border-light" : "border-dark");
-        })
-
-        // Character filter buttons
-        _.forEach(characterFilters, (button) => {
-
-            if (button.classList.contains("btn-success") || button.classList.contains("btn-danger"))
-                return;
-
-            button.classList.add(useDarkMode.checked ? "btn-outline-light" : "btn-outline-dark");
-        });
-    }
+    // Update combat log styling if already exist
+    updateCombatLogMode(enabled);
 }
 
 function resetStyles() {
-    // Clear the style of the json text area and instance ID filtering
-    // window.jsonTextArea.style = "";
-    // window.inputInstanceID.style = "";
 
     // Only remove classes if this is not the first time toggling dark mode in this session.
     if (bgColor > 0 || textColor.length > 0) {
 
-        // Json text area and instance filter
-        window.jsonTextArea.classList.remove(bgColor, textColor);
-        window.inputInstanceID.style.backgroundColor = useDarkMode.checked ? blackColorCode : whiteColorCode;  
-        window.inputInstanceID.style.color = useDarkMode.checked ? whiteColorCode : blackColorCode;
+        // Boxes on left container
+        _.forEach(cardBodies, (cardBody) => {
+            cardBody.classList.remove(bgColor, textColor);
+        });
 
-        // Versioning
-        versioning.classList.remove(textColor);
+        // Combat log header "invisible" scroll
+        _.forEach(hiddenScrolls, (hiddenScroll) => {
+            hiddenScroll.classList.remove(useDarkMode.checked ? "lightmode-hidden-scroll" : "darkmode-hidden-scroll");
+        });
+
+        // Form controls (Textarea, input, etc.)
+        _.forEach(formControls, (formControl) => {
+            formControl.style.backgroundColor = useDarkMode.checked ? blackColorCode : whiteColorCode;
+            formControl.style.color = useDarkMode.checked ? whiteColorCode : blackColorCode;
+        });
 
         // Check boxes. Uses different colour scheme for dark mode for visibility.
         _.forEach(formCheckInputs, (checkBox) => {
@@ -105,33 +96,39 @@ function resetStyles() {
             label.classList.remove(bgColor, textColor);
         });
 
-        // Boxes on left container
-        _.forEach(cardBodies, (cardBody) => {
-            cardBody.classList.remove(bgColor, textColor);
-        });
-        
-        // Json file is loaded already
-        if (window.jsonFile) {
-            var rowEntries = document.getElementsByClassName("border-opacity-10");
-    
-            // Update every single row entry class
-            _.forEach(rowEntries, (entry) => {
-                entry.classList.remove(useDarkMode.checked ? "border-dark" : "border-light");
-            })
-
-            // Character filter buttons
-            _.forEach(characterFilters, (button) => {
-                if (button.classList.contains("btn-outline-dark"))
-                    button.classList.remove("btn-outline-dark");
-
-                if (button.classList.contains("btn-outline-light"))
-                    button.classList.remove("btn-outline-light");
-            });
-        }
+        // Versioning
+        versioning.classList.remove(textColor);
     }
 }
 
-useDarkMode.addEventListener('change', function (evt) {
+function updateCombatLogMode(darkmode = false) {
+    if (window.jsonFile) {
+        var rowEntries = document.getElementsByClassName("border-opacity-10");
+
+        // Update every single row entry class
+        _.forEach(rowEntries, (entry) => {
+            entry.classList.remove(darkmode ? "border-dark" : "border-light");
+            entry.classList.add(darkmode ? "border-light" : "border-dark");
+        })
+
+        // Character filter buttons
+        _.forEach(characterFilters, (button) => {
+
+            if (button.classList.contains("btn-success") || button.classList.contains("btn-danger"))
+                return;
+
+            if (button.classList.contains("btn-outline-dark"))
+                button.classList.remove("btn-outline-dark");
+
+            if (button.classList.contains("btn-outline-light"))
+                button.classList.remove("btn-outline-light");
+
+            button.classList.add(darkmode ? "btn-outline-light" : "btn-outline-dark");
+        });
+    }
+}
+
+useDarkMode.addEventListener("change", function (evt) {
     // Save the dark mode toggle setting into local storage
     localStorage.setItem(keyNames[0], evt.currentTarget.checked ? 1 : 0);
     toggleDarkMode(evt.currentTarget.checked);
