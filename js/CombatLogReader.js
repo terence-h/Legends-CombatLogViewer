@@ -188,6 +188,7 @@ function addCombatLog(combatLog) {
     var showTags = showTagFilter.checked;
 
     jsonTextArea.placeholder = showJsonFilter.checked ? combatLog : "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
+    instanceIDFilter.placeholder = !showJsonFilter.checked && combatLog ? "Instance ID filter | 6 22 or 6,22" : "Instance ID Filter..";
 
     combatLog.forEach((log) => {
 
@@ -668,10 +669,14 @@ showJsonFilter.addEventListener("change", function (evt) {
 
     localStorage.setItem(keyNames[2], evt.currentTarget.checked ? 1 : 0);
 
-    if (evt.currentTarget.checked)
+    if (evt.currentTarget.checked) {
         window.jsonTextArea.placeholder = "Drag & Drop Combat Log JSON file here...";
-    else
+        window.instanceIDFilter.placeholder = "Instance ID filter | 6 22 or 6,22";
+    }
+    else {
         window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
+        window.instanceIDFilter.placeholder = "Instance ID filter...";
+    }
 
     if (jsonFile == null)
         return;
