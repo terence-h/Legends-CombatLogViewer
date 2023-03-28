@@ -55,6 +55,10 @@ html, body {
     color: rgb(21, 115, 71);
 }
 
+.log-shield-colour {
+    color: rgb(59, 131, 190);
+}
+
 /* Tags dropdown button */
 .log-dropdown-button {
     padding: 2%;

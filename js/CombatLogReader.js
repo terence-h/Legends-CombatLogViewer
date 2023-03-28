@@ -177,6 +177,7 @@ function addCombatLog(combatLog) {
     // var dgpNftID = "";
     var instanceID = "";
     var timestamp = "";
+    var shieldHP = undefined;
     var duration = undefined;
     var tags = [];
 
@@ -197,11 +198,16 @@ function addCombatLog(combatLog) {
         instanceID = log.event ? log.event.instanceID : log.instanceID ? log.instanceID : undefined;
         timestamp = log.timestamp;
         tags = log.event ? log.event.tag : undefined;
+        shieldHP = log.event ? log.event?.shieldhp ? log.event.shieldhp : undefined : undefined;
+
+        if (shieldHP)
+            dgpSlotId = log.event.targetID;
 
         // Show only selected instance IDs
         if (!filterByInstanceID(instanceID))
             return;
 
+        // Show by timestamp
         if ((startTime != "" || endTime != "") && !filterByTimestamp(timestamp))
             return;
 
@@ -255,6 +261,9 @@ function addCombatLog(combatLog) {
         // Do not append the col-6 log for match end event.
         if (log.eventID != EventID.MatchEnd)
             row.append(colLog);
+
+        if (shieldHP != undefined)
+            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${shieldHP}`, "shield", "col-1", "border-dark", "border-end");
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
@@ -425,6 +434,12 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
                     // colText.setAttribute("id", "log-damage-colour");
                     colText.classList.add("log-damage-colour");
                 }
+                break;
+            }
+
+            case "shield": {
+                text = _.replace(text, "-", "");
+                colText.classList.add("log-shield-colour");
                 break;
             }
 
