@@ -263,7 +263,7 @@ function addCombatLog(combatLog) {
             row.append(colLog);
 
         if (shieldHP != undefined)
-            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${shieldHP}`, "shield", "col-1", "border-dark", "border-end");
+            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${shieldHP.toFixed(0)}`, "shield", "col-1", "border-dark", "border-end");
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
