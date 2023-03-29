@@ -25,15 +25,15 @@ window.onload = function(evt) {
         createCombatLogTagHeader();
 
     // Show/hide json string in textarea
-    window.showJsonFilter.checked = keyValues[2] == 0 ? false : true;
+    window.searchFriendly.checked = keyValues[2] == 0 ? false : true;
 
-    if (evt.currentTarget.checked) {
-        window.jsonTextArea.placeholder = "Drag & Drop Combat Log JSON file here...";
-        window.instanceIDFilter.placeholder = "Instance ID filter | 6 22 or 6,22";
+    if (window.searchFriendly.checked) {
+        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop or Paste Combat Log JSON file here...";
+        window.instanceIDFilter.placeholder = "Instance ID filter...";
     }
     else {
-        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
-        window.instanceIDFilter.placeholder = "Instance ID filter...";
+        window.jsonTextArea.placeholder = "Drag & Drop or Paste Combat Log JSON file here...";
+        window.instanceIDFilter.placeholder = "Instance ID filter | 6 22 or 6,22";
     }
         
 

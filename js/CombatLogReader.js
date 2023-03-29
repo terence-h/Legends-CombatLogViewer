@@ -15,7 +15,7 @@ var showBuffFilter = document.getElementById("checkbox-checked-buff");
 var showEnergyFilter = document.getElementById("checkbox-checked-energy");
 var showAnimFilter = document.getElementById("checkbox-checked-anim");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
-var showJsonFilter = document.getElementById("checkbox-checked-json");
+var searchFriendly = document.getElementById("checkbox-checked-json");
 var movePanelToLeft = document.getElementById("checkbox-checked-move-panel");
 var characterFilters = null;
 
@@ -188,8 +188,8 @@ function addCombatLog(combatLog) {
     var showAnims = showAnimFilter.checked;
     var showTags = showTagFilter.checked;
 
-    jsonTextArea.placeholder = showJsonFilter.checked ? combatLog : "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
-    instanceIDFilter.placeholder = !showJsonFilter.checked && combatLog ? "Instance ID filter | 6 22 or 6,22" : "Instance ID Filter..";
+    jsonTextArea.placeholder = searchFriendly.checked ? "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop or Paste Combat Log JSON file here..." : combatLog;
+    instanceIDFilter.placeholder = searchFriendly.checked && combatLog ? "Instance ID filter..." : "Instance ID filter | 6 22 or 6,22";
 
     combatLog.forEach((log) => {
 
@@ -680,23 +680,24 @@ showTagFilter.addEventListener("change", function (evt) {
     }
 });
 
-showJsonFilter.addEventListener("change", function (evt) {
+searchFriendly.addEventListener("change", function (evt) {
 
     localStorage.setItem(keyNames[2], evt.currentTarget.checked ? 1 : 0);
 
     if (evt.currentTarget.checked) {
-        window.jsonTextArea.placeholder = "Drag & Drop Combat Log JSON file here...";
-        window.instanceIDFilter.placeholder = "Instance ID filter | 6 22 or 6,22";
+        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop or Paste Combat Log JSON file here...";
+        window.instanceIDFilter.placeholder = "Instance ID filter...";
     }
     else {
-        window.jsonTextArea.placeholder = "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop Combat Log JSON file here...";
-        window.instanceIDFilter.placeholder = "Instance ID filter...";
+        
+        window.jsonTextArea.placeholder = "Drag & Drop or Paste Combat Log JSON file here...";
+        window.instanceIDFilter.placeholder = "Instance ID filter | 6 22 or 6,22";
     }
 
     if (jsonFile == null)
         return;
 
-    window.jsonTextArea.value = evt.currentTarget.checked ? window.jsonString : "";
+    window.jsonTextArea.value = evt.currentTarget.checked ? "" : window.jsonString;
 });
 
 movePanelToLeft.addEventListener("change", function (evt) {

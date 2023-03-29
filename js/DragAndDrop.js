@@ -23,13 +23,17 @@ jsonTextArea.ondrop = function (e) {
     reader.onload = function (event) {
         try {
             jsonString = event.target.result;
-            jsonTextArea.value = window.showJsonFilter.checked ? event.target.result : "";
+
             jsonFile = JSON.parse(event.target.result);
+
+            if (!window.searchFriendly.checked)
+                jsonTextArea.value = jsonString;
+
             console.log(jsonFile);
             window.initialiseCombatLog();
         }
         catch (error) {
-            jsonTextArea.value = "Not a JSON file. 💩💩💩"
+            jsonTextArea.value = "Not a valid combat log. 💩💩💩"
             console.error(error);
         }
     };
@@ -38,3 +42,21 @@ jsonTextArea.ondrop = function (e) {
 
     return false;
 };
+
+jsonTextArea.addEventListener("input", function (event) {
+    
+    event.preventDefault();
+
+    try {
+        jsonString = event.target.value;
+        jsonFile = JSON.parse(event.target.value);
+
+        jsonTextArea.value = window.searchFriendly.checked ? "" : jsonString;
+
+        console.log(jsonFile);
+        window.initialiseCombatLog();
+    }
+    catch (error) {
+        console.error(error);
+    }
+});
