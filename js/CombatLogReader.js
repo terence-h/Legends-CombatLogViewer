@@ -14,6 +14,7 @@ var showHealFilter = document.getElementById("checkbox-checked-heal");
 var showBuffFilter = document.getElementById("checkbox-checked-buff");
 var showEnergyFilter = document.getElementById("checkbox-checked-energy");
 var showAnimFilter = document.getElementById("checkbox-checked-anim");
+var showMovementFilter = document.getElementById("checkbox-checked-movement");
 var showTagFilter = document.getElementById("checkbox-checked-tag");
 var searchFriendly = document.getElementById("checkbox-checked-json");
 var movePanelToLeft = document.getElementById("checkbox-checked-move-panel");
@@ -186,6 +187,7 @@ function addCombatLog(combatLog) {
     var showBuffs = showBuffFilter.checked;
     var showEnergyUpdate = showEnergyFilter.checked;
     var showAnims = showAnimFilter.checked;
+    var showMovements = showMovementFilter.checked;
     var showTags = showTagFilter.checked;
 
     jsonTextArea.placeholder = searchFriendly.checked ? "JSON string is being hidden. Enjoy your Ctrl + F.\n\nDrag & Drop or Paste Combat Log JSON file here..." : combatLog;
@@ -200,8 +202,11 @@ function addCombatLog(combatLog) {
         tags = log.event ? log.event.tag : undefined;
         shieldHP = log.event ? log.event?.shieldhp ? log.event.shieldhp : undefined : undefined;
 
-        if (shieldHP)
+        // Custom log for shield taking damage, this should be marked as damage event.
+        if (shieldHP) {
             dgpSlotId = log.event.targetID;
+            log.eventID = EventID.TakeDamage;
+        }
 
         // Show only selected instance IDs
         if (!filterByInstanceID(instanceID))
@@ -228,6 +233,10 @@ function addCombatLog(combatLog) {
         if (!instanceID && _.endsWith(log.log, "animation.") && !showAnims)
             return;
 
+        // Show/Hide movement events
+        if (!instanceID && !showMovements && log.eventID == EventID.Movement)
+            return;
+
         // Show/Hide buffs
         if (log.eventID == EventID.StatusEffect && !showBuffs)
             return;
@@ -248,9 +257,9 @@ function addCombatLog(combatLog) {
 
         // Timestamp right border
         if (showTagFilter.checked)
-            colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1", "border-dark", "border-end");
+            colTimestamp = createTextLog(true, timestamp.toFixed(3), "timestamp", "col-1", "border-dark", "border-end");
         else
-            colTimestamp = createTextLog(true, timestamp.toString(), "timestamp", "col-1");
+            colTimestamp = createTextLog(true, timestamp.toFixed(3), "timestamp", "col-1");
 
         // Only create the drop down when the log entry has tags.
         if (tags != undefined && showTags)
@@ -278,6 +287,10 @@ function addCombatLog(combatLog) {
                 break;
             }
             case EventID.TakeDamage: { // Take Damage
+                // Custom shield take damage event. Don't need to create the extra logs below
+                if (shieldHP != undefined)
+                    break;
+
                 colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
                 colTargetHP = createTextLog(true, log.event.hp.toString(), "targetHP", "col-1", "border-dark", "border-end");
                 colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
@@ -662,6 +675,10 @@ showEnergyFilter.addEventListener("change", function (evt) {
 });
 
 showAnimFilter.addEventListener("change", function (evt) {
+    resetCombatLog();
+});
+
+showMovementFilter.addEventListener("change", function (evt) {
     resetCombatLog();
 });
 
