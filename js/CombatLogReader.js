@@ -31,6 +31,7 @@ var combatId = null;
 // Display data
 // var dgpNames = [];
 var dgpShortenNames = [];
+var maxHP = [];
 
 // Filter
 var selectedDGPs = [];
@@ -134,10 +135,14 @@ function addCharacters(characters, isEnemy = false) {
         var col = document.createElement("div");
         col.classList.add("col-2");
 
+        var flooredMaxHP = _.floor(character.hp);
+
+        maxHP.push(flooredMaxHP);
+
         // Buttons for each character with it's max HP.
         var btn = document.createElement("button");
-        // btn.innerHTML = `${dgpShortenNames[character.id]} - ${character.hp} HP`;
-        btn.innerHTML = `${dgpShortenNames[character.id]} - ${character.id}`;
+        btn.innerHTML = `${dgpShortenNames[character.id]} - ${flooredMaxHP} HP`;
+        // btn.innerHTML = `${dgpShortenNames[character.id]} - ${character.id}`;
         btn.classList.add("btn", "btn-xs", isEnemy ? "btn-danger" : "btn-success", "character-filter");
         btn.type = "button";
         btn.index = character.id;
@@ -272,7 +277,7 @@ function addCombatLog(combatLog) {
             row.append(colLog);
 
         if (shieldHP != undefined)
-            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${shieldHP.toFixed(0)}`, "shield", "col-1", "border-dark", "border-end");
+            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${_.floor(shieldHP)}`, "shield", "col-1", "border-dark", "border-end");
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
@@ -291,8 +296,10 @@ function addCombatLog(combatLog) {
                 if (shieldHP != undefined)
                     break;
 
+                var hpPercentage = (log.event.hp / maxHP[log.event.targetID-1] * 100).toFixed(1);
+
                 colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
-                colTargetHP = createTextLog(true, log.event.hp.toString(), "targetHP", "col-1", "border-dark", "border-end");
+                colTargetHP = createTextLog(true, `${_.floor(log.event.hp)}/${maxHP[log.event.targetID-1]}\n${hpPercentage}%`, "targetHP", "col-1", "border-dark", "border-end");
                 colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tEnergy", "col-1", "border-dark", "border-end");
                 break;
