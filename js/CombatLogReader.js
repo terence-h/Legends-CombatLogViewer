@@ -277,7 +277,7 @@ function addCombatLog(combatLog) {
             row.append(colLog);
 
         if (shieldHP != undefined)
-            colDmgHealDur = createTextLog(true, `${log.event.damageAmount}/${_.floor(shieldHP)}`, "shield", "col-1", "border-dark", "border-end");
+            colDmgHealDur = createTextLog(true, `${log.event.damageAmount} dmg<br>(${_.floor(shieldHP)} HP)`, "shield", "col-1", "border-dark", "border-end");
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
@@ -299,7 +299,7 @@ function addCombatLog(combatLog) {
                 var hpPercentage = (log.event.hp / maxHP[log.event.targetID-1] * 100).toFixed(1);
 
                 colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
-                colTargetHP = createTextLog(true, `${_.floor(log.event.hp)}/${maxHP[log.event.targetID-1]}\n${hpPercentage}%`, "targetHP", "col-1", "border-dark", "border-end");
+                colTargetHP = createTextLog(true, `${_.floor(log.event.hp)}/${maxHP[log.event.targetID-1]}<br>${hpPercentage}%`, "targetHP", "col-1", "border-dark", "border-end");
                 colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tEnergy", "col-1", "border-dark", "border-end");
                 break;
