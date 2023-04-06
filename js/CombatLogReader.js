@@ -184,6 +184,7 @@ function addCombatLog(combatLog) {
     var instanceID = "";
     var timestamp = "";
     var shieldHP = undefined;
+    var maxShieldHP = undefined;
     var duration = undefined;
     var tags = [];
 
@@ -209,6 +210,7 @@ function addCombatLog(combatLog) {
 
         // Custom log for shield taking damage, this should be marked as damage event.
         if (shieldHP) {
+            maxShieldHP = log.event.maxshieldhp;
             dgpSlotId = log.event.targetID;
             log.eventID = EventID.TakeDamage;
         }
@@ -277,7 +279,7 @@ function addCombatLog(combatLog) {
             row.append(colLog);
 
         if (shieldHP != undefined)
-            colDmgHealDur = createTextLog(true, `${log.event.damageAmount} dmg<br>(${_.floor(shieldHP)} HP)`, "shield", "col-1", "border-dark", "border-end");
+            colDmgHealDur = createTextLog(true, `-${log.event.damageAmount}<br>(${_.floor(shieldHP)}/${_.floor(maxShieldHP)})`, "shield", "col-1", "border-dark", "border-end");
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
