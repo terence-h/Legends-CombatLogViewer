@@ -278,8 +278,11 @@ function addCombatLog(combatLog) {
         if (log.eventID != EventID.MatchEnd)
             row.append(colLog);
 
-        if (shieldHP != undefined)
-            colDmgHealDur = createTextLog(true, `-${log.event.damageAmount}<br>(${_.floor(shieldHP)}/${_.floor(maxShieldHP)})`, "shield", "col-1", "border-dark", "border-end");
+        if (shieldHP != undefined) {
+            colDmgHealDur = createTextLog(true, `-${log.event.damageAmount}`, "shield", "col-1", "border-dark", "border-end");
+            colTargetHP = createTextLog(true, `${_.floor(shieldHP)}/${_.floor(maxShieldHP)}<br>${_.floor((shieldHP/maxShieldHP*100), 1)}%`, "shield", "col-1", "border-dark", "border-end");
+        }
+            
 
         switch(log.eventID) {
             case EventID.Movement: { // Movement
@@ -299,9 +302,11 @@ function addCombatLog(combatLog) {
                     break;
 
                 var hpPercentage = (log.event.hp / maxHP[log.event.targetID-1] * 100).toFixed(1);
+                var dmgString = log.event.damageAmount.toString();
+                var isHeal = _.startsWith(dmgString, "-");
 
-                colDmgHealDur = createTextLog(true, log.event.damageAmount.toString(), "damage", "col-1", "border-dark", "border-end");
-                colTargetHP = createTextLog(true, `${_.floor(log.event.hp)}/${maxHP[log.event.targetID-1]}<br>${hpPercentage}%`, "targetHP", "col-1", "border-dark", "border-end");
+                colDmgHealDur = createTextLog(true, dmgString, "damage", "col-1", "border-dark", "border-end");
+                colTargetHP = createTextLog(true, `${_.floor(log.event.hp)}/${maxHP[log.event.targetID-1]}<br>${hpPercentage}%`, isHeal ? "targetHPheal" : "targetHPdmg", "col-1", "border-dark", "border-end");
                 colAttackerEnergy = createTextLog(true, `${log.event.attackerEnergy} (${dgpSlotId})`, "cEnergy", "col-1", "border-dark", "border-end");
                 colTargetEnergy = createTextLog(true, `${log.event.targetEnergy} (${log.event.targetID})`, "tEnergy", "col-1", "border-dark", "border-end");
                 break;
@@ -460,8 +465,17 @@ function createTextLog(isTextCenter = false, text = "", type = "", ...colClasses
             }
 
             case "shield": {
-                text = _.replace(text, "-", "");
                 colText.classList.add("log-shield-colour");
+                break;
+            }
+
+            case "targetHPheal": {
+                colText.classList.add("log-heal-colour");
+                break;
+            }
+
+            case "targetHPdmg": {
+                colText.classList.add("log-damage-colour");
                 break;
             }
 
