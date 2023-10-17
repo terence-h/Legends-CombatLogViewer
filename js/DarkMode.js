@@ -61,6 +61,15 @@ function toggleDarkMode(enabled = false) {
     // Versioning
     versioning.classList.add(textColor);
 
+    // Statistics
+    _.each(friendlyNumbers, (text) => {
+        text.classList.add(textColor);
+    });
+
+    _.each(enemyNumbers, (text) => {
+        text.classList.add(textColor);
+    });
+
     // Update combat log styling if already exist
     updateCombatLogMode(enabled);
 }
@@ -98,6 +107,15 @@ function resetStyles() {
 
         // Versioning
         versioning.classList.remove(textColor);
+
+        // Statistics
+        _.each(friendlyNumbers, (text) => {
+            text.classList.remove(textColor);
+        });
+
+        _.each(enemyNumbers, (text) => {
+            text.classList.remove(textColor);
+        });
     }
 }
 

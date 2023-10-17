@@ -160,8 +160,6 @@ function setupChart() {
         }
     });
 
-    console.log(deathTimeCharting);
-
     _.each(friendlies, (friendly) => {
         drawChart(friendly);
         updateNumbers(friendly);
