@@ -62,6 +62,8 @@ function toggleDarkMode(enabled = false) {
     versioning.classList.add(textColor);
 
     // Statistics
+    chartHeader.classList.add(textColor);
+
     _.each(friendlyNumbers, (text) => {
         text.classList.add(textColor);
     });
@@ -109,6 +111,8 @@ function resetStyles() {
         versioning.classList.remove(textColor);
 
         // Statistics
+        chartHeader.classList.remove(textColor);
+
         _.each(friendlyNumbers, (text) => {
             text.classList.remove(textColor);
         });
