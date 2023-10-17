@@ -90,6 +90,11 @@ html, body {
     border-color:black;
 }
 
+/* Chart styling */
+.friendly-numbers, .enemy-numbers {
+    margin-bottom: 7.5vh;
+}
+
 /* Visible scrollbar */
 ::-webkit-scrollbar {
     width: 10px;

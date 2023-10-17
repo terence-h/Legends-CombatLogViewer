@@ -1,7 +1,18 @@
 var canvasFriendly = document.getElementsByClassName("canvas-line-chart-friendly");
 var canvasEnemy = document.getElementsByClassName("canvas-line-chart-enemy");
+var friendlyNumbers = document.getElementsByClassName("friendly-numbers");
+var enemyNumbers = document.getElementsByClassName("enemy-numbers");
+var chartHeader = document.getElementById("chart-header");
+var charts = [];
 var damageCharting = [];
+var damageTakenCharting = [];
 var healingCharting = [];
+var shieldDamageCharting = [];
+var deathTimeCharting = [];
+var dpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var hpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var shieldNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var lastTimestamp = 0;
 
 function setupChart() {
@@ -13,16 +24,58 @@ function setupChart() {
 
     damageCharting = [];
     healingCharting = [];
+    shieldDamageCharting = [];
+    deathTimeCharting = [];
+    dpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    hpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    shieldNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    _.each(charts, (chart) => {
+        chart.destroy();
+    });
+
+    _.each(friendlyNumbers, (text) => {
+        text.innerHTML = "";
+    });
+
+    _.each(enemyNumbers, (text) => {
+        text.innerHTML = "";
+    });
+
+    // im not having fun here.
+    chartHeader.innerHTML = "STATISTICS";
 
     lastTimestamp = _.last(combatLog).timestamp;
 
     _.each(combatLog, (log) => {
-        if (!log.characterID)
-            return;
 
+        // This is a damage taken event
         if (log.eventID && log.eventID == 3) {
 
-            //if (log.event.damageAmount > 0) {
+            // This is a shield damage taken event
+            if (!log.characterID) {
+
+                // Empty array, push a starting point of (0,0) to the array first
+                if (!shieldDamageCharting[log.event.targetID]) {
+                    shieldDamageCharting[log.event.targetID] = [];
+                    shieldDamageCharting[log.event.targetID].push({
+                        x: 0,
+                        y: 0
+                    });
+                }
+
+                // Get the last log, if it exist
+                var lastLog = shieldDamageCharting[log.event.targetID][shieldDamageCharting[log.event.targetID].length - 1];
+
+                shieldDamageCharting[log.event.targetID].push({
+                    x: log.timestamp,
+                    y: log.event.damageAmount + (lastLog != null ? lastLog.y : 0)
+                });
+                return;
+            }
+
+            // This is a heal event
             if (_.includes(log.log, "heals")) {
                 if (!healingCharting[log.characterID]) {
                     healingCharting[log.characterID] = [];
@@ -32,14 +85,22 @@ function setupChart() {
                     });
                 }
 
+                // Get the last log, if it exist
                 var lastLog = healingCharting[log.characterID][healingCharting[log.characterID].length - 1];
 
+                // We want the total heal and not each individual heal, so we take the last log and add the heal.
                 healingCharting[log.characterID].push({
                     x: log.timestamp,
                     y: Math.abs(log.event.damageAmount) + (lastLog != null ? lastLog.y : 0)
                 });
+
+                // HPS numbers (not adjusted for death)
+                hpsNumbers[log.characterID] = _.last(healingCharting[log.characterID]).y;
             }
+            // This is a damage event
             else {
+                
+                // Empty array, push a starting point of (0,0) to the array first
                 if (!damageCharting[log.characterID]) {
                     damageCharting[log.characterID] = [];
                     damageCharting[log.characterID].push({
@@ -48,36 +109,78 @@ function setupChart() {
                     });
                 }
 
+                // Get the last log, if it exist
                 var lastLog = damageCharting[log.characterID][damageCharting[log.characterID].length - 1];
 
+                // We want the total damage and not each individual damage, so we take the last log and add the damage.
                 damageCharting[log.characterID].push({
                     x: log.timestamp,
                     y: log.event.damageAmount + (lastLog != null ? lastLog.y : 0)
+                });
+
+                // DPS numbers (not adjusted for death)
+                dpsNumbers[log.characterID] = _.last(damageCharting[log.characterID]).y;
+
+                // We only want to parse damage in if the target health is actually reduced
+                if (log.event.damageAmount > 0) {
+
+                    // Damage in
+                    if (!damageTakenCharting[log.event.targetID]) {
+                        damageTakenCharting[log.event.targetID] = [];
+                        damageTakenCharting[log.event.targetID].push({
+                            x: 0,
+                            y: 0
+                        });
+                    }
+
+                    // Get the last log, if it exist
+                    lastLog = damageTakenCharting[log.event.targetID][damageTakenCharting[log.event.targetID].length - 1];
+
+                    // We want the total damage and not each individual damage, so we take the last log and add the damage.
+                    damageTakenCharting[log.event.targetID].push({
+                        x: log.timestamp,
+                        y: log.event.damageAmount + (lastLog != null ? lastLog.y : 0)
+                    });
+
+                    dmgTaken[log.event.targetID] = _.last(damageTakenCharting[log.event.targetID]).y;
+                }
+            }
+            return;
+        }
+
+        // This is a death event
+        if (log.event && log.eventID == 4) {
+            if (!deathTimeCharting[log.characterID]) {
+                deathTimeCharting[log.characterID] = [];
+                deathTimeCharting[log.characterID].push({
+                    x: log.timestamp,
+                    y: 0
                 });
             }
         }
     });
 
-    console.log("Damage Logs")
-    console.log(damageCharting);
-    console.log("Healing Logs");
-    console.log(healingCharting);
+    console.log(deathTimeCharting);
 
     _.each(friendlies, (friendly) => {
         drawChart(friendly);
+        updateNumbers(friendly);
     });
 
     _.each(enemies, (enemy) => {
         drawChart(enemy, true);
+        updateNumbers(enemy, true);
     });
 }
 
 function drawChart(data, isEnemy = false) {
 
+    var shortenedName = _.replace(data.name, isEnemy ? " - enemy" : " - friendly", "");
+
     const chartData = {
         datasets: [
             {
-                label: data.name + " (Damage)",
+                label: shortenedName + " (Damage out)",
                 data: damageCharting[data.id],
                 borderColor: 'rgb(200, 0, 0)',
                 backgroundColor: 'rgb(200, 0, 0)',
@@ -85,17 +188,41 @@ function drawChart(data, isEnemy = false) {
                 showLine: true,
             },
             {
-                label: data.name + " (Heal)",
+                label: shortenedName + " (Heal out)",
                 data: healingCharting[data.id],
                 borderColor: 'rgb(0, 200, 0)',
                 backgroundColor: 'rgb(0, 200, 0)',
+                fill: false,
+                showLine: true
+            },
+            {
+                label: shortenedName + " (Damage in)",
+                data: damageTakenCharting[data.id],
+                borderColor: 'rgb(200, 0, 200)',
+                backgroundColor: 'rgb(200, 0, 200)',
+                fill: false,
+                showLine: true
+            },
+            {
+                label: shortenedName + " (Damage in by shield)",
+                data: shieldDamageCharting[data.id],
+                borderColor: 'rgb(0, 0, 200)',
+                backgroundColor: 'rgb(0, 0, 200)',
+                fill: false,
+                showLine: true
+            },
+            {
+                label: shortenedName + " (Death)",
+                data: deathTimeCharting[data.id],
+                borderColor: 'rgb(64, 64, 64)',
+                backgroundColor: 'rgb(64, 64, 64)',
                 fill: false,
                 showLine: true
             }
         ]
     };
 
-    new Chart(isEnemy ? canvasEnemy[data.id - 6] : canvasFriendly[data.id - 1], {
+    charts.push(new Chart(isEnemy ? canvasEnemy[data.id - 6] : canvasFriendly[data.id - 1], {
         type: 'scatter',
         data: chartData,
         options: {
@@ -128,5 +255,33 @@ function drawChart(data, isEnemy = false) {
                 }
             }
         }
-    });
+    }));
+}
+
+function updateNumbers(data, isEnemy = false) {
+
+    var dps = dpsNumbers[data.id] ? _.round(dpsNumbers[data.id] / lastTimestamp, 1) : 0;
+    var dpsTillDeath = deathTimeCharting[data.id] ? _.round(dpsNumbers[data.id] / deathTimeCharting[data.id][0].x, 1) : dps > 0 ? dps : 0;
+
+    var hps = hpsNumbers[data.id] ? _.round(hpsNumbers[data.id] / lastTimestamp, 1) : 0;
+    var hpsTillDeath = deathTimeCharting[data.id] ? _.round(hpsNumbers[data.id] / deathTimeCharting[data.id][0].x, 1) : hps > 0 ? hps : 0;
+
+    var dmgTakenPs = dmgTaken[data.id] ? _.round(dmgTaken[data.id] / lastTimestamp, 1) : 0;
+    var dtpsTillDeath = deathTimeCharting[data.id] ? _.round(dmgTaken[data.id] / deathTimeCharting[data.id][0].x, 1) : dmgTakenPs > 0 ? dmgTakenPs : 0;
+
+    isEnemy ? enemyNumbers[data.id - 6].innerHTML =
+            `Damage per second: ${dps}<br />
+            Heal per second (until end of combat): ${hps}<br />
+            Damage taken per second (until end of combat): ${dmgTakenPs}<br /><br />
+            Damage per second (until death): ${dpsTillDeath}<br />
+            Heal per second (until death): ${hpsTillDeath}<br />
+            Damage taken per second (until death): ${dtpsTillDeath}`
+            
+            : friendlyNumbers[data.id - 1].innerHTML =
+            `Damage per second: ${dps}<br />
+            Heal per second (until end of combat): ${hps}<br />
+            Damage taken per second (until end of combat): ${dmgTakenPs}<br /><br />
+            Damage per second (until death): ${dpsTillDeath}<br />
+            Heal per second (until death): ${hpsTillDeath}<br />
+            Damage taken per second (until death): ${dtpsTillDeath}`
 }
