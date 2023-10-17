@@ -15,6 +15,7 @@
     <!-- HEAD SCRIPTS -->
     <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="node_modules/lodash/lodash.min.js"></script>
+    <script src="node_modules/chart.js/dist/chart.umd.js"></script>
 </head>
 
 <body style="display:none;">
@@ -189,13 +190,25 @@
 
                     <!-- Versioning -->
                     <div class="pt-3">
-                        <p class="text-end" id="versioning">Version 1.0.19</p>
+                        <p class="text-end" id="versioning">Version 1.0.20</p>
                     </div>
                 </div>
 
             </div>
 
         </div>
+
+        <!-- CHART STATISTICS -->
+        <canvas class="canvas-line-chart-friendly" width="30px"></canvas>
+        <canvas class="canvas-line-chart-friendly"></canvas>
+        <canvas class="canvas-line-chart-friendly"></canvas>
+        <canvas class="canvas-line-chart-friendly"></canvas>
+        <canvas class="canvas-line-chart-friendly"></canvas>
+        <canvas class="canvas-line-chart-enemy"></canvas>
+        <canvas class="canvas-line-chart-enemy"></canvas>
+        <canvas class="canvas-line-chart-enemy"></canvas>
+        <canvas class="canvas-line-chart-enemy"></canvas>
+        <canvas class="canvas-line-chart-enemy"></canvas>
 
     </div>
 
@@ -204,6 +217,7 @@
     <script src="js/CombatLogReader.js"></script>
     <script src="js/DarkMode.js"></script>
     <script src="js/LocalStorage.js"></script>
+    <script src="js/PalsStatistics.js"></script>
 </body>
 
 </html>

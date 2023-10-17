@@ -31,6 +31,7 @@ jsonTextArea.ondrop = function (e) {
 
             console.log(jsonFile);
             window.initialiseCombatLog();
+            window.setupChart();
         }
         catch (error) {
             jsonTextArea.value = "Not a valid combat log. 💩💩💩"
@@ -55,6 +56,7 @@ jsonTextArea.addEventListener("input", function (event) {
 
         console.log(jsonFile);
         window.initialiseCombatLog();
+        window.setupChart();
     }
     catch (error) {
         console.error(error);
