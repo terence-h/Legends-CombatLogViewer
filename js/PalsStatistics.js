@@ -37,6 +37,7 @@ function setupChart() {
     dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     hpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     shieldNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    died = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
 
     _.each(charts, (chart) => {
         chart.destroy();
