@@ -24,8 +24,10 @@ function setupChart() {
 
     damageCharting = [];
     healingCharting = [];
+    damageTakenCharting = [];
     shieldDamageCharting = [];
     deathTimeCharting = [];
+
     dpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     hpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -159,6 +161,12 @@ function setupChart() {
             }
         }
     });
+
+    // Sort the charting by timestamp incase the timestamp is not in ordered due to combat log issue
+    _.each(damageCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
+    _.each(damageTakenCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
+    _.each(healingCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
+    _.each(shieldDamageCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
 
     _.each(friendlies, (friendly) => {
         drawChart(friendly);
