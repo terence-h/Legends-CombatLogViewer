@@ -201,62 +201,78 @@ function drawChart(data, index = -1, isEnemy = false) {
 
     var shortenedName = _.replace(data.name, isEnemy ? " - enemy" : " - friendly", "");
 
-    const chartData = {
-        datasets: [
-            {
-                label: shortenedName + " (Kills)",
-                data: killTimeCharting[data.id],
-                borderColor: 'rgb(255, 255, 0)',
-                backgroundColor: 'rgb(255, 255, 0)',
-                fill: false,
-                showLine: false
-            },
-            {
-                label: shortenedName + " (Damage out)",
-                data: damageCharting[data.id],
-                borderColor: 'rgb(200, 0, 0)',
-                backgroundColor: 'rgb(200, 0, 0)',
-                fill: false,
-                showLine: true,
-            },
-            {
-                label: shortenedName + " (Heal out)",
-                data: healingCharting[data.id],
-                borderColor: 'rgb(0, 200, 0)',
-                backgroundColor: 'rgb(0, 200, 0)',
-                fill: false,
-                showLine: true
-            },
-            {
-                label: shortenedName + " (Damage in)",
-                data: damageTakenCharting[data.id],
-                borderColor: 'rgb(200, 0, 200)',
-                backgroundColor: 'rgb(200, 0, 200)',
-                fill: false,
-                showLine: true
-            },
-            {
-                label: shortenedName + " (Damage in by shield)",
-                data: shieldDamageCharting[data.id],
-                borderColor: 'rgb(0, 0, 200)',
-                backgroundColor: 'rgb(0, 0, 200)',
-                fill: false,
-                showLine: true
-            },
-            {
-                label: shortenedName + " (Death)",
-                data: deathTimeCharting[data.id],
-                borderColor: 'rgb(64, 64, 64)',
-                backgroundColor: 'rgb(64, 64, 64)',
-                fill: false,
-                showLine: false
-            }
-        ]
-    };
+    var datasets = [];
+
+    // Only push the charting if there are existing plots. (Reduce the amount of unnecessary legends. heh.)
+    if (killTimeCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Kills)",
+            data: killTimeCharting[data.id],
+            borderColor: 'rgb(255, 255, 0)',
+            backgroundColor: 'rgb(255, 255, 0)',
+            fill: false,
+            showLine: false
+        });
+    }
+    
+    if (damageCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Damage out)",
+            data: damageCharting[data.id],
+            borderColor: 'rgb(200, 0, 0)',
+            backgroundColor: 'rgb(200, 0, 0)',
+            fill: false,
+            showLine: true,
+        });
+    }
+
+    if (healingCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Heal out)",
+            data: healingCharting[data.id],
+            borderColor: 'rgb(0, 200, 0)',
+            backgroundColor: 'rgb(0, 200, 0)',
+            fill: false,
+            showLine: true
+        });
+    }
+
+    if (damageTakenCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Damage in)",
+            data: damageTakenCharting[data.id],
+            borderColor: 'rgb(200, 0, 200)',
+            backgroundColor: 'rgb(200, 0, 200)',
+            fill: false,
+            showLine: true
+        });
+    }
+
+    if (shieldDamageCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Damage in by shield)",
+            data: shieldDamageCharting[data.id],
+            borderColor: 'rgb(0, 0, 200)',
+            backgroundColor: 'rgb(0, 0, 200)',
+            fill: false,
+            showLine: true
+        });
+    }
+
+    if (deathTimeCharting[data.id]) {
+        datasets.push({
+            label: shortenedName + " (Death)",
+            data: deathTimeCharting[data.id],
+            borderColor: 'rgb(64, 64, 64)',
+            backgroundColor: 'rgb(64, 64, 64)',
+            fill: false,
+            showLine: false
+        });
+    }
 
     charts.push(new Chart(isEnemy ? canvasEnemy[index] : canvasFriendly[index], {
         type: 'scatter',
-        data: chartData,
+        data: { datasets },
         options: {
             responsive: true,
             plugins: {
