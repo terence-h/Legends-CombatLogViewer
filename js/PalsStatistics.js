@@ -174,18 +174,18 @@ function setupChart() {
     _.each(healingCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
     _.each(shieldDamageCharting, (charting) => { charting = _.orderBy(charting, ["x"], ["asc"]); });
 
-    _.each(friendlies, (friendly) => {
-        drawChart(friendly);
-        updateNumbers(friendly);
+    _.each(friendlies, (friendly, key) => {
+        drawChart(friendly, key);
+        updateNumbers(friendly, key);
     });
 
-    _.each(enemies, (enemy) => {
-        drawChart(enemy, true);
-        updateNumbers(enemy, true);
+    _.each(enemies, (enemy, key) => {
+        drawChart(enemy, key, true);
+        updateNumbers(enemy, key, true);
     });
 }
 
-function drawChart(data, isEnemy = false) {
+function drawChart(data, index = -1, isEnemy = false) {
 
     var shortenedName = _.replace(data.name, isEnemy ? " - enemy" : " - friendly", "");
 
@@ -234,7 +234,7 @@ function drawChart(data, isEnemy = false) {
         ]
     };
 
-    charts.push(new Chart(isEnemy ? canvasEnemy[data.id - 6] : canvasFriendly[data.id - 1], {
+    charts.push(new Chart(isEnemy ? canvasEnemy[index] : canvasFriendly[index], {
         type: 'scatter',
         data: chartData,
         options: {
@@ -270,7 +270,7 @@ function drawChart(data, isEnemy = false) {
     }));
 }
 
-function updateNumbers(data, isEnemy = false) {
+function updateNumbers(data, index = -1, isEnemy = false) {
 
     var dps = dpsNumbers[data.id] ? _.round(dpsNumbers[data.id] / lastTimestamp, 1) : 0;
     var dpsTillDeath = deathTimeCharting[data.id] ? _.round(dpsNumbers[data.id] / deathTimeCharting[data.id][0].x, 1) : dps > 0 ? dps : 0;
@@ -281,7 +281,7 @@ function updateNumbers(data, isEnemy = false) {
     var dmgTakenPs = dmgTaken[data.id] ? _.round(dmgTaken[data.id] / lastTimestamp, 1) : 0;
     var dtpsTillDeath = deathTimeCharting[data.id] ? _.round(dmgTaken[data.id] / deathTimeCharting[data.id][0].x, 1) : dmgTakenPs > 0 ? dmgTakenPs : 0;
 
-    isEnemy ? enemyNumbers[data.id - 6].innerHTML =
+    isEnemy ? enemyNumbers[index].innerHTML =
             `<span style='text-decoration: underline;'>Until End of Combat (${lastTimestamp})</span><br />
             Damage per second: ${dps}<br />
             Heal per second: ${hps}<br />
@@ -291,7 +291,7 @@ function updateNumbers(data, isEnemy = false) {
             Heal per second: ${died[data.id] >= 0 ? hpsTillDeath : "-"}<br />
             Damage taken per second: ${died[data.id] >= 0 ? dtpsTillDeath : "-"}`
             
-            : friendlyNumbers[data.id - 1].innerHTML =
+            : friendlyNumbers[index].innerHTML =
             `<span style='text-decoration: underline;'>Until End of Combat (${lastTimestamp})</span><br />
             Damage per second: ${dps}<br />
             Heal per second: ${hps}<br />
