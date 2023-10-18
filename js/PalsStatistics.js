@@ -16,7 +16,7 @@ var dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var hpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var shieldNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-var died = [false, false, false, false, false, false, false, false, false, false, false];
+var died = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
 
 var lastTimestamp = 0;
 
@@ -163,7 +163,7 @@ function setupChart() {
                 y: 0
             });
 
-            died[log.characterID] = true;
+            died[log.characterID] = log.timestamp;
         }
     });
 
@@ -281,22 +281,22 @@ function updateNumbers(data, isEnemy = false) {
     var dtpsTillDeath = deathTimeCharting[data.id] ? _.round(dmgTaken[data.id] / deathTimeCharting[data.id][0].x, 1) : dmgTakenPs > 0 ? dmgTakenPs : 0;
 
     isEnemy ? enemyNumbers[data.id - 6].innerHTML =
-            `<span style='text-decoration: underline;'>Until End of Combat</span><br />
+            `<span style='text-decoration: underline;'>Until End of Combat (${lastTimestamp})</span><br />
             Damage per second: ${dps}<br />
             Heal per second: ${hps}<br />
             Damage taken per second: ${dmgTakenPs}<br /><br />
-            <span style='text-decoration: underline;'>Until Death</span><br />
-            Damage per second: ${died[data.id] ? dpsTillDeath : "-"}<br />
-            Heal per second: ${died[data.id] ? hpsTillDeath : "-"}<br />
-            Damage taken per second: ${died[data.id] ? dtpsTillDeath : "-"}`
+            <span style='text-decoration: underline;'>Until Death ${died[data.id] >=0 ? `(${died[data.id].toFixed(3)})` : ""}</span><br />
+            Damage per second: ${died[data.id] >= 0 ? dpsTillDeath : "-"}<br />
+            Heal per second: ${died[data.id] >= 0 ? hpsTillDeath : "-"}<br />
+            Damage taken per second: ${died[data.id] >= 0 ? dtpsTillDeath : "-"}`
             
             : friendlyNumbers[data.id - 1].innerHTML =
-            `<span style='text-decoration: underline;'>Until End of Combat</span><br />
+            `<span style='text-decoration: underline;'>Until End of Combat (${lastTimestamp})</span><br />
             Damage per second: ${dps}<br />
             Heal per second: ${hps}<br />
             Damage taken per second: ${dmgTakenPs}<br /><br />
-            <span style='text-decoration: underline;'>Until Death</span><br />
-            Damage per second: ${died[data.id] ? dpsTillDeath : "-"}<br />
-            Heal per second: ${died[data.id] ? hpsTillDeath : "-"}<br />
-            Damage taken per second: ${died[data.id] ? dtpsTillDeath : "-"}`;
+            <span style='text-decoration: underline;'>Until Death ${died[data.id] >=0 ? `(${died[data.id].toFixed(3)})` : ""}</span><br />
+            Damage per second: ${died[data.id] >= 0 ? dpsTillDeath : "-"}<br />
+            Heal per second: ${died[data.id] >= 0 ? hpsTillDeath : "-"}<br />
+            Damage taken per second: ${died[data.id] >= 0 ? dtpsTillDeath : "-"}`;
 }
