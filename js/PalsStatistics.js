@@ -10,6 +10,7 @@ var damageTakenCharting = [];
 var healingCharting = [];
 var shieldDamageCharting = [];
 var deathTimeCharting = [];
+var killTimeCharting = [];
 
 var dpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -28,10 +29,11 @@ function setupChart() {
     var enemies = jsonFile.enemy[0].id != 6 ? jsonFile.enemy.reverse() : jsonFile.enemy;
 
     damageCharting = [];
-    healingCharting = [];
     damageTakenCharting = [];
+    healingCharting = [];
     shieldDamageCharting = [];
     deathTimeCharting = [];
+    killTimeCharting = [];
 
     dpsNumbers = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     dmgTaken = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -158,6 +160,16 @@ function setupChart() {
 
         // This is a death event
         if (log.event && log.eventID == 4) {
+
+            if (!killTimeCharting[log.event.attackerID]) {
+                killTimeCharting[log.event.attackerID] = [];
+            }
+
+            killTimeCharting[log.event.attackerID].push({
+                x: log.timestamp,
+                y: _.last(damageCharting[log.event.attackerID]).y
+            });
+
             deathTimeCharting[log.characterID] = [];
             deathTimeCharting[log.characterID].push({
                 x: log.timestamp,
@@ -191,6 +203,14 @@ function drawChart(data, index = -1, isEnemy = false) {
 
     const chartData = {
         datasets: [
+            {
+                label: shortenedName + " (Kills)",
+                data: killTimeCharting[data.id],
+                borderColor: 'rgb(255, 255, 0)',
+                backgroundColor: 'rgb(255, 255, 0)',
+                fill: false,
+                showLine: false
+            },
             {
                 label: shortenedName + " (Damage out)",
                 data: damageCharting[data.id],
@@ -229,7 +249,7 @@ function drawChart(data, index = -1, isEnemy = false) {
                 borderColor: 'rgb(64, 64, 64)',
                 backgroundColor: 'rgb(64, 64, 64)',
                 fill: false,
-                showLine: true
+                showLine: false
             }
         ]
     };
